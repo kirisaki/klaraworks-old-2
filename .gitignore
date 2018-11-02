@@ -1,0 +1,8 @@
+.stack-work/
+klaraworks.cabal
+*~
+
+node_modules/
+yarn-error.log
+.elm/
+dist/
