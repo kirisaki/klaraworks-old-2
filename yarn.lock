@@ -387,7 +387,7 @@ binary-extensions@^1.0.0:
   resolved "https://registry.yarnpkg.com/binary-extensions/-/binary-extensions-1.12.0.tgz#c2d780f53d45bba8317a8902d4ceeaf3a6385b14"
   integrity sha512-DYWGk01lDcxeS/K9IHPGWfT8PsJmbXRtRd2Sx72Tnb8pcYZQFF1oSDb8hJtS1vhp212q1Rzi5dUf9+nq0o9UIg==
 
-"binary@>= 0.3.0 < 1":
+"binary@>= 0.3.0 < 1", binary@^0.3.0:
   version "0.3.0"
   resolved "https://registry.yarnpkg.com/binary/-/binary-0.3.0.tgz#9f60553bc5ce8c3386f3b553cff47462adecaa79"
   integrity sha1-n2BVO8XOjDOG87VTz/R0Yq3sqnk=
@@ -404,6 +404,17 @@ binwrap@0.1.4:
     request-promise "^4.2.0"
     tar "^2.2.1"
     unzip "^0.1.11"
+
+binwrap@^0.2.0:
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/binwrap/-/binwrap-0.2.0.tgz#572d0f48c4e767d72d622f0b805ed7ce1db16f9a"
+  integrity sha512-HUspivC8zPE37KJQ0S4zsNHUpymzQBinmpdMoa+JwmB6Mi+p30ywVZJcillYpbQmiX2wLykaaDJxXmwZkbaZGA==
+  dependencies:
+    mustache "^2.3.0"
+    request "^2.87.0"
+    request-promise "^4.2.0"
+    tar "^2.2.1"
+    unzip-stream "^0.3.0"
 
 block-stream@*:
   version "0.0.9"
@@ -1066,6 +1077,13 @@ elliptic@^6.0.0:
     inherits "^2.0.1"
     minimalistic-assert "^1.0.0"
     minimalistic-crypto-utils "^1.0.0"
+
+elm-format@^0.8.1:
+  version "0.8.1"
+  resolved "https://registry.yarnpkg.com/elm-format/-/elm-format-0.8.1.tgz#37796fc06b8460a6d76a054a1216d86d8481155e"
+  integrity sha512-uLcDICdmEoRBaCp3PobcvHtUej2RJFHRYfMd7i3CSH+RsajJYTdiPkviKIq823Kd4gfjQMpNajEyM1lLFez7+A==
+  dependencies:
+    binwrap "^0.2.0"
 
 elm-webpack-loader@^5.0.0:
   version "5.0.0"
@@ -2327,6 +2345,11 @@ ms@2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/ms/-/ms-2.0.0.tgz#5608aeadfc00be6c2901df5f9861788de0d597c8"
   integrity sha1-VgiurfwAvmwpAd9fmGF4jeDVl8g=
+
+mustache@^2.3.0:
+  version "2.3.2"
+  resolved "https://registry.yarnpkg.com/mustache/-/mustache-2.3.2.tgz#a6d4d9c3f91d13359ab889a812954f9230a3d0c5"
+  integrity sha512-KpMNwdQsYz3O/SBS1qJ/o3sqUJ5wSb8gb0pul8CO0S56b9Y2ALm8zCfsjPXsqGFfoNBkDwZuZIAjhsZI03gYVQ==
 
 nan@^2.10.0, nan@^2.9.2:
   version "2.11.1"
@@ -3797,6 +3820,14 @@ unset-value@^1.0.0:
   dependencies:
     has-value "^0.3.1"
     isobject "^3.0.0"
+
+unzip-stream@^0.3.0:
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/unzip-stream/-/unzip-stream-0.3.0.tgz#c30c054cd6b0d64b13a23cd3ece911eb0b2b52d8"
+  integrity sha512-NG1h/MdGIX3HzyqMjyj1laBCmlPYhcO4xEy7gEqqzGiSLw7XqDQCnY4nYSn5XSaH8mQ6TFkaujrO8d/PIZN85A==
+  dependencies:
+    binary "^0.3.0"
+    mkdirp "^0.5.1"
 
 unzip@^0.1.11:
   version "0.1.11"

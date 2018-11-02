@@ -5,4 +5,5 @@ klaraworks.cabal
 node_modules/
 yarn-error.log
 .elm/
+elm-stuff/
 dist/
