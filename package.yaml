@@ -9,6 +9,10 @@ copyright:           "Copyright: (c) 2018 Akihito KIRISAKI"
 extra-source-files:
 - README.md
 - ChangeLog.md
+- client/index.html
+- client/index.js
+- client/Main.elm
+- client/scss/style.scss
 
 synopsis:            My website server
 category:            Web
@@ -17,6 +21,19 @@ description:         Please see the README on GitHub at <https://github.com/kiri
 
 dependencies:
 - base >= 4.7 && < 5
+- aeson
+- bytestring
+- directory
+- http-types
+- lens
+- lens-aeson
+- process
+- template-haskell
+- text
+- vector
+- wai
+- warp
+- yaml
 
 library:
   source-dirs: server
