@@ -75,12 +75,12 @@ jobs:
           command: |
             . venv/bin/activate
             
-            export task_template='[{\"name\":\"klaraworks-task\",\"image\":\"%s.dkr.ecr.%s.amazonaws.com/klaraworks:%s\",\"essential\":true,\"portMappings\": [{\"hostPort\":80,\"containerPort\":80}]}]'
+            export task_template='\"[{\"name\":\"klaraworks-task\",\"image\":\"%s.dkr.ecr.%s.amazonaws.com/klaraworks:%s\",\"essential\":true,\"portMappings\": [{\"hostPort\":80,\"containerPort\":80}]}]\"'
             export task=$(printf "$task_template" $AWS_ACCOUNT_ID $AWS_DEFAULT_REGION $CIRCLE_SHA1)
             
             export revision=$(eval aws ecs register-task-definition \
             --requires-compatibilities EC2 --cpu 512 --memory 512 --network-mode bridge \
-            --execution-role-arn arn:aws:iam::$AWS_ACCOUNT_ID:role/ecsServiceRole --container-definitions $task --family service:klara-web | jq '.taskDefinition.taskDefinitionArn' --raw-output)
+            --execution-role-arn arn:aws:iam::$AWS_ACCOUNT_ID:role/ecsServiceRole --container-definitions \"$task\" --family service:klara-web | jq '.taskDefinition.taskDefinitionArn' --raw-output)
 
             aws ecs update-service --cluster klaraworks-cluster --service klara-web --task-definition $revision
 
