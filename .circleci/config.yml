@@ -47,29 +47,36 @@ jobs:
       - checkout
       - setup_remote_docker
       - attach_workspace:
-          at: workspace
+        at: workspace
       - restore_cache:
-          key: venv
+        key: venv
       - run:
-          name: Install awscli
-          command: |
-            python3 -m venv venv
-            . venv/bin/activate
-            pip install awscli
+        name: Install awscli
+        command: |
+          python3 -m venv venv
+          . venv/bin/activate
+          pip install awscli
       - save_cache:
-          key: venv
-          paths:
-            - "venv"
+        key: venv
+        paths:
+        - "venv"
       - run:
-          name: Load image
-          command: |
-            docker load --input workspace/docker-image/image.tar
+        name: Load image
+        command: |
+          docker load --input workspace/docker-image/image.tar
       - run:
-          name: Push image
-          command: |
-            . venv/bin/activate
-            eval $(aws ecr get-login --region $AWS_DEFAULT_REGION --no-include-email)
-            docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$CIRCLE_PROJECT_REPONAME:$CIRCLE_SHA1
+        name: Push image
+        command: |
+          . venv/bin/activate
+          aws ecr get-login --region $AWS_DEFAULT_REGION --no-include-email
+          docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$CIRCLE_PROJECT_REPONAME:$CIRCLE_SHA1
+      - run:
+        name: Deploy
+        command: |
+          . venv/bin/activate
+          export task='[{"name":"klara-web","image":"`$AWS_ACCOUNT_ID`.dkr.ecr.`$AWS_DEFALT_REGION`.amazonaws.com/klaraworks:`$CIRCLE_SHA1`","essential":true,"portMappings":[{"hostPort":80,"containerPort":80}]}]'
+          export revision=$(aws ecs register-task-definition --requires-compatibilities EC2 --cpu 512 --memory 512 --network-mode bridge --execution-role-arn $EXECUTION_ROLE_ARN --container-definitions "$task" --family service:klara-web | jq '.taskDefinition.taskDefinitionArn' --raw-output)
+          aws ecs update-service --cluster klaraworks-cluster --service klara-web --task-definition $revision
 
 workflows:
   version: 2
