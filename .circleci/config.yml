@@ -81,7 +81,7 @@ jobs:
             '[\{\"name\":\"klaraworks-container\",\"image\":\"${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/klaraworks:${CIRCLE_SHA1}\",\"essential\":true,\"portMappings\":[\{\"containerPort\":80,\"hostPort\":80}\]\}]' \
             --family klaraworks-task | jq '.taskDefinition.taskDefinitionArn' --raw-output)
 
-            aws ecs update-service --cluster klaraworks-cluster --service klara-web --task-definition $revision
+            aws ecs update-service --cluster klaraworks-cluster --service klara-web --task-definition $revision --force-new-deployment
 
 workflows:
   version: 2
