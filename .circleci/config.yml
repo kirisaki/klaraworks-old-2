@@ -75,7 +75,7 @@ jobs:
           command: |
             . venv/bin/activate
             
-            export task_template='\"[{\"name\":\"klaraworks-task\",\"image\":\"%s.dkr.ecr.%s.amazonaws.com/klaraworks:%s\",\"essential\":true,\"portMappings\": [{\"hostPort\":80,\"containerPort\":80}]}]\"'
+            export task_template='\\\"[{\\\"name\\\":\\\"klaraworks-task\\\",\\\"image\\\":\\\"%s.dkr.ecr.%s.amazonaws.com/klaraworks:%s\\\",\\\"essential\\\":true,\\\"portMappings\\\": [{\\\"hostPort\\\":80,\\\"containerPort\\\":80}]}]\\\"'
             export task=$(printf "$task_template" $AWS_ACCOUNT_ID $AWS_DEFAULT_REGION $CIRCLE_SHA1)
             
             export revision=$(eval aws ecs register-task-definition \
