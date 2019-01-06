@@ -74,12 +74,15 @@ jobs:
           name: Deploy
           command: |
             . venv/bin/activate
+            
             export task=$(eval echo '[{"name":"klara-web",\
             "image":"${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFALT_REGION}.amazonaws.com/klaraworks:${CIRCLE_SHA1}",\
             "essential":true,"portMappings":[{"hostPort":80,"containerPort":80}]}]')
+            
             export revision=$(eval aws ecs register-task-definition \
             --requires-compatibilities EC2 --cpu 512 --memory 512 --network-mode bridge \
-            --execution-role-arn arn:aws:iam::{$AWS_ACCOUNT_ID}:role/ecsServiceRole --container-definitions "$task" --family service:klara-web | jq '.taskDefinition.taskDefinitionArn' --raw-output)
+            --execution-role-arn arn:aws:iam::{$AWS_ACCOUNT_ID}:role/ecsServiceRole --container-definitions "${task}" --family service:klara-web | jq '.taskDefinition.taskDefinitionArn' --raw-output)
+            
             aws ecs update-service --cluster klaraworks-cluster --service klara-web --task-definition $revision
 
 workflows:
