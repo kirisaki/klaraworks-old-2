@@ -56,5 +56,5 @@ view model =
     div []
         [ h1 [] [ text (String.fromInt model.dieFace) ]
         , button [ onClick Roll ] [ text "Roll!" ]
-        , text "nyan--!"
+        , text "nyan----!"
         ]
