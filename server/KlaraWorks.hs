@@ -51,12 +51,13 @@ main = do
         head_ $ do
           meta_ [ charset_ "utf-8" ]
           title_ [] "Klara Works"
+          style_ [] (".container{width:100vw;height:100vh}" :: ST.Text)
           link_  [rel_ "stylesheet", href_ "/style.css"]
         body_ $ do
-          div_ [id_ "main" ] ""
+          div_ [id_ "main"] ""
           script_ [src_ "/main.js"] ("" :: ST.Text)
     , mainJs = LTE.encodeUtf8 $(loadFile "dist/main.js") <>
-               "var app = Elm.Main.init({node: document.getElementById('main')})"
+               "var app = Elm.Main.init()"
     , styleCss = LTE.encodeUtf8 . renderWith compact [] $
         h1 ?
           color "#fa8"
