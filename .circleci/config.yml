@@ -70,18 +70,18 @@ jobs:
             . venv/bin/activate
             eval $(aws ecr get-login --region $AWS_DEFAULT_REGION --no-include-email)
             docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$CIRCLE_PROJECT_REPONAME:$CIRCLE_SHA1
-      - run:
-          name: Deploy
-          command: |
-            . venv/bin/activate
+      # - run:
+      #     name: Deploy
+      #     command: |
+      #       . venv/bin/activate
             
-            export revision=$(eval aws ecs register-task-definition \
-            --requires-compatibilities EC2 --cpu 256 --memory 256 --network-mode awsvpc \
-            --execution-role-arn arn:aws:iam::$AWS_ACCOUNT_ID:role/ecsTaskExecutionRole --container-definitions \
-            '[\{\"name\":\"klaraworks-container\",\"image\":\"${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/klaraworks:${CIRCLE_SHA1}\",\"essential\":true,\"portMappings\":[\{\"containerPort\":80\}]\}]' \
-            --family klaraworks-task | jq '.taskDefinition.taskDefinitionArn' --raw-output)
+      #       export revision=$(eval aws ecs register-task-definition \
+      #       --requires-compatibilities EC2 --cpu 256 --memory 256 --network-mode awsvpc \
+      #       --execution-role-arn arn:aws:iam::$AWS_ACCOUNT_ID:role/ecsTaskExecutionRole --container-definitions \
+      #       '[\{\"name\":\"klaraworks-container\",\"image\":\"${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/klaraworks:${CIRCLE_SHA1}\",\"essential\":true,\"portMappings\":[\{\"containerPort\":80\}]\}]' \
+      #       --family klaraworks-task | jq '.taskDefinition.taskDefinitionArn' --raw-output)
 
-            aws ecs update-service --cluster klaraworks-cluster --service klara-web --task-definition $revision --force-new-deployment
+      #       aws ecs update-service --cluster klaraworks-cluster --service klara-web --task-definition $revision --force-new-deployment
 
 workflows:
   version: 2

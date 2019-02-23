@@ -35,20 +35,15 @@ dependencies:
 - warp
 - yaml
 
-library:
-  source-dirs: server
-
 executables:
   klaraworks:
-    main:                Main.hs
-    source-dirs:         app
+    main:                KlaraWorks.hs
+    source-dirs:         server
     ghc-options:
     - -threaded
     - -rtsopts
     - -with-rtsopts=-N
-    dependencies:
-    - klaraworks
-
+ 
 tests:
   klaraworks-test:
     main:                Spec.hs
@@ -57,5 +52,4 @@ tests:
     - -threaded
     - -rtsopts
     - -with-rtsopts=-N
-    dependencies:
-    - klaraworks
+ 

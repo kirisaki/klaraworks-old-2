@@ -1,8 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TemplateHaskell   #-}
-module KlaraWorks
-    ( boot
-    ) where
+module Main where
 
 import           KlaraWorks.TH
 
@@ -34,7 +32,7 @@ mainJs = encodeUtf8 $(loadFile "dist/main.js")
 indexHtml :: ByteString
 indexHtml = encodeUtf8 $(loadFile "dist/index.html")
 
-boot :: IO ()
-boot = do
+main :: IO ()
+main = do
   print "Running at \"http://localhost:8000\""
   run 8000 server
