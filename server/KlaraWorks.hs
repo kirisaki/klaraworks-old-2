@@ -27,7 +27,7 @@ server Assets{..} req respond =
     ["style.css"] ->
       respond $ responseLBS
       status200
-      [("Content-Type", "text/stylesheet")]
+      [("Content-Type", "text/css")]
       styleCss
     _ ->
       respond $ responseLBS
@@ -51,9 +51,10 @@ main = do
         head_ $ do
           meta_ [ charset_ "utf-8" ]
           title_ [] "Klara Works"
+          link_  [rel_ "stylesheet", href_ "/style.css"]
         body_ $ do
           div_ [id_ "main" ] ""
-          script_ [src_ "main.js"] ("" :: ST.Text)
+          script_ [src_ "/main.js"] ("" :: ST.Text)
     , mainJs = LTE.encodeUtf8 $(loadFile "dist/main.js") <>
                "var app = Elm.Main.init({node: document.getElementById('main')})"
     , styleCss = LTE.encodeUtf8 . renderWith compact [] $
