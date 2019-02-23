@@ -1,19 +1,18 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RecordWildCards   #-}
 {-# LANGUAGE TemplateHaskell   #-}
-{-# LANGUAGE RecordWildCards #-}
 module Main where
 
 import           KlaraWorks.TH
 
-import           Data.ByteString.Lazy
-import           Data.Text.Lazy
-import           Data.Text.Lazy.Encoding
+import qualified Data.ByteString.Lazy     as LBS
+import qualified Data.Text.Lazy.Encoding  as LTE
 import           Network.HTTP.Types
 import           Network.Wai
 import           Network.Wai.Handler.Warp
 
 server :: Assets -> Application
-server Assets{..} req respond = do
+server Assets{..} req respond =
   case pathInfo req of
     ["main.js"] ->
       respond $ responseLBS
@@ -27,8 +26,8 @@ server Assets{..} req respond = do
       indexHtml
 
 data Assets = Assets
-  { indexHtml :: ByteString
-  , mainJs :: ByteString
+  { indexHtml :: LBS.ByteString
+  , mainJs    :: LBS.ByteString
   -- , styleCss :: ByteString
   }
 
@@ -37,6 +36,6 @@ main = do
   $(build)
   print "Running at \"http://localhost:8000\""
   run 8000 . server $ Assets
-    { indexHtml = encodeUtf8 $(loadFile "dist/index.html")
-    , mainJs = encodeUtf8 $(loadFile "dist/main.js")
+    { indexHtml = LTE.encodeUtf8 $(loadFile "dist/index.html")
+    , mainJs = LTE.encodeUtf8 $(loadFile "dist/main.js")
     }
