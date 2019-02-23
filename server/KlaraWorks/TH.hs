@@ -31,6 +31,10 @@ build = do
         mapM fromJSON .
         V.toList $ y ^. key "extra-source-files" ._Array
   mapM_ addDependentFile deps
-  runIO $ callCommand "yarn"
-  runIO $ callCommand "yarn run webpack"
+  runIO $ do
+    callCommand "npm i"
+    createDirectoryIfMissing True "./__temp"
+    callCommand "npx elm make client/Main.elm --optimize --output=./__temp/main.js"
+    callCommand "npx uglifyjs --compress --mangle -- ./__temp/main.js > ./dist/main.js"
+    removeDirectoryRecursive "./__temp"
   [| return () |]

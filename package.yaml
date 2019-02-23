@@ -9,10 +9,7 @@ copyright:           "Copyright: (c) 2018 Akihito KIRISAKI"
 extra-source-files:
 - README.md
 - ChangeLog.md
-- client/index.html
-- client/index.js
 - client/Main.elm
-- client/scss/style.scss
 
 synopsis:            My website server
 category:            Web
@@ -23,10 +20,12 @@ dependencies:
 - base >= 4.7 && < 5
 - aeson
 - bytestring
+- clay
 - directory
 - http-types
 - lens
 - lens-aeson
+- lucid
 - process
 - template-haskell
 - text
