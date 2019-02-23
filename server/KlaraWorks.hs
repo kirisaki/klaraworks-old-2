@@ -51,7 +51,12 @@ main = do
         head_ $ do
           meta_ [ charset_ "utf-8" ]
           title_ [] "Klara Works"
-          style_ [] (".container{width:100vw;height:100vh}" :: ST.Text)
+          style_ [] $ LTE.encodeUtf8 . renderWith compact [] $ do
+            ".container" ? do
+              width (vw 100)
+              height (vh 100)
+            (body <> h1) ?
+              margin nil nil nil nil
           link_  [rel_ "stylesheet", href_ "/style.css"]
         body_ $ do
           div_ [id_ "main"] ""
