@@ -1,5 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TemplateHaskell   #-}
+{-# LANGUAGE RecordWildCards #-}
 module Main where
 
 import           KlaraWorks.TH
@@ -11,9 +12,8 @@ import           Network.HTTP.Types
 import           Network.Wai
 import           Network.Wai.Handler.Warp
 
-server :: Application
-server req respond = do
-  $(build)
+server :: Assets -> Application
+server Assets{..} req respond = do
   case pathInfo req of
     ["main.js"] ->
       respond $ responseLBS
@@ -26,13 +26,17 @@ server req respond = do
       [("Content-Type", "text/html")]
       indexHtml
 
-mainJs :: ByteString
-mainJs = encodeUtf8 $(loadFile "dist/main.js")
-
-indexHtml :: ByteString
-indexHtml = encodeUtf8 $(loadFile "dist/index.html")
+data Assets = Assets
+  { indexHtml :: ByteString
+  , mainJs :: ByteString
+  -- , styleCss :: ByteString
+  }
 
 main :: IO ()
 main = do
+  $(build)
   print "Running at \"http://localhost:8000\""
-  run 8000 server
+  run 8000 . server $ Assets
+    { indexHtml = encodeUtf8 $(loadFile "dist/index.html")
+    , mainJs = encodeUtf8 $(loadFile "dist/main.js")
+    }
