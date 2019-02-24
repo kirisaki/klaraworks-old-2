@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: kirisaki/overflow:lts-13.8
+      - image: kirisaki/klaraworks-builder:0.2
     steps:
       - checkout
       - setup_remote_docker
@@ -71,6 +71,7 @@ jobs:
           root: .
           paths:
             - docker-image
+  
   deploy:  
     docker:
       - image: circleci/python:3.6.1
