@@ -4,8 +4,10 @@
 module Main where
 
 import           KlaraWorks.TH
+import           Paths_klaraworks
 
 import qualified Data.ByteString.Lazy     as LBS
+import           Data.FileEmbed           (embedFile)
 import qualified Data.Text                as ST
 import qualified Data.Text.Lazy.Encoding  as LTE
 import           Network.HTTP.Types
@@ -29,6 +31,11 @@ server Assets{..} req respond =
       status200
       [("Content-Type", "text/css")]
       styleCss
+    ["back.svg"] ->
+      respond $ responseLBS
+      status200
+      [("Content-Type", "image/svg+xml")]
+      backSvg
     _ ->
       respond $ responseLBS
       status200
@@ -39,6 +46,7 @@ data Assets = Assets
   { indexHtml :: LBS.ByteString
   , mainJs    :: LBS.ByteString
   , styleCss  :: LBS.ByteString
+  , backSvg   :: LBS.ByteString
   }
 
 boot :: IO ()
@@ -59,12 +67,13 @@ boot = do
           link_  [rel_ "stylesheet", href_ "/style.css"]
         body_ $ do
           div_ [id_ "main"] ""
-          script_ [src_ "/main.js"] ("" :: ST.Text)
+          script_ [src_ "/main.js"] ST.empty
     , mainJs = LTE.encodeUtf8 $(loadFile "dist/main.js") <>
                "var app = Elm.Main.init()"
     , styleCss = LTE.encodeUtf8 . renderWith compact [] $
                  h1 ?
                  color "#fa0"
+    , backSvg = LBS.fromStrict $(embedFile "assets/back.svg")
     }
 
 
