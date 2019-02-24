@@ -73,7 +73,7 @@ view model =
           [ div [ class "container" ]
                 [ h1 [] [ text (String.fromInt model.dieFace) ]
                 , button [ onClick Roll ] [ text "Roll!" ]
-                , text "nyan!!!"
+                , text "nya-----------!!!"
                 ]
           ]
     }

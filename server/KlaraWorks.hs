@@ -41,10 +41,9 @@ data Assets = Assets
   , styleCss  :: LBS.ByteString
   }
 
-main :: IO ()
-main = do
+boot :: IO ()
+boot = do
   $(build)
-  print "Running at \"http://localhost:8000\""
   run 8000 . server $ Assets
     { indexHtml = renderBS $
       doctypehtml_ $ do
@@ -64,7 +63,11 @@ main = do
     , mainJs = LTE.encodeUtf8 $(loadFile "dist/main.js") <>
                "var app = Elm.Main.init()"
     , styleCss = LTE.encodeUtf8 . renderWith compact [] $
-        h1 ?
-          color "#fa8"
+                 h1 ?
+                 color "#fa0"
     }
 
+
+main :: IO ()
+main =
+  boot

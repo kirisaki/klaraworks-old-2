@@ -1,6 +1,8 @@
 {-# LANGUAGE LambdaCase #-}
 module Devel where
 
+import           Main               (boot)
+
 import           Control.Concurrent
 import           Control.Monad
 import           Data.IORef
@@ -15,7 +17,8 @@ tidIndex = 1
 
 update :: IO ()
 update =
-  lookupStore tidIndex >>= \case
+  lookupStore tidIndex >>=
+  \case
     Just tidStore -> restart tidStore
     _ -> do
       lock <- storeAction lockStore newEmptyMVar
@@ -32,15 +35,16 @@ update =
         readStore lockStore >>= start >>= writeIORef ref
     start :: MVar () -> IO ThreadId
     start lock =
-        forkFinally
-            (putStrLn "nyaan")
-            (\_ -> putMVar lock () >> shutdown)
+      forkFinally
+      boot
+      (\_ -> putMVar lock () >> shutdown)
 
 shutdown :: IO ()
 shutdown =
-    lookupStore tidIndex >>= \case
-      Just tidStore -> do
-          withStore tidStore $ readIORef >=> killThread
-          putStrLn "shutdown"
-      _ -> putStrLn "no application running"
+  lookupStore tidIndex >>=
+  \case
+    Just tidStore -> do
+      withStore tidStore $ readIORef >=> killThread
+      putStrLn "shutdown"
+    _ -> putStrLn "no application running"
 
