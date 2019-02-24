@@ -33,7 +33,7 @@ jobs:
       - restore_cache:
           name: Restore .stack cache
           keys:
-            - stack-packages-{{ checksum "yarn.lock" }}
+            - stack-packages-{{ checksum "package.json" }}
       - run:
           name: Build server
           command: stack build
