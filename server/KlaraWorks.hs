@@ -1,8 +1,9 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards   #-}
 {-# LANGUAGE TemplateHaskell   #-}
-module Main where
+module Main (main, boot) where
 
+import           KlaraWorks.Style
 import           KlaraWorks.TH
 import           Paths_klaraworks
 
@@ -14,33 +15,32 @@ import           Network.HTTP.Types
 import           Network.Wai
 import           Network.Wai.Handler.Warp
 
-import           Clay
+import           Clay                     hiding (style)
 
 import           Lucid
 
 server :: Assets -> Application
-server Assets{..} req respond =
-  case pathInfo req of
-    ["main.js"] ->
-      respond $ responseLBS
-      status200
-      [("Content-Type", "text/javascript")]
-      mainJs
-    ["style.css"] ->
-      respond $ responseLBS
-      status200
-      [("Content-Type", "text/css")]
-      styleCss
-    ["back.svg"] ->
-      respond $ responseLBS
-      status200
-      [("Content-Type", "image/svg+xml")]
-      backSvg
-    _ ->
-      respond $ responseLBS
-      status200
-      [("Content-Type", "text/html")]
-      indexHtml
+server Assets{..} req respond' =
+  let
+    respond t = respond' . responseLBS status200 t
+  in
+    case pathInfo req of
+      ["main.js"] ->
+        respond
+        [("Content-Type", "text/javascript")]
+        mainJs
+      ["style.css"] ->
+        respond
+        [("Content-Type", "text/css")]
+        styleCss
+      ["back.svg"] ->
+        respond
+        [("Content-Type", "image/svg+xml")]
+        backSvg
+      _ ->
+        respond
+        [("Content-Type", "text/html")]
+        indexHtml
 
 data Assets = Assets
   { indexHtml :: LBS.ByteString
@@ -53,26 +53,10 @@ boot :: IO ()
 boot = do
   $(build)
   run 8000 . server $ Assets
-    { indexHtml = renderBS $
-      doctypehtml_ $ do
-        head_ $ do
-          meta_ [ charset_ "utf-8" ]
-          title_ [] "Klara Works"
-          style_ [] $ LTE.encodeUtf8 . renderWith compact [] $ do
-            ".container" ? do
-              width (vw 100)
-              height (vh 100)
-            (body <> h1) ?
-              margin nil nil nil nil
-          link_  [rel_ "stylesheet", href_ "/style.css"]
-        body_ $ do
-          div_ [id_ "main"] ""
-          script_ [src_ "/main.js"] ST.empty
+    { indexHtml = index
     , mainJs = LTE.encodeUtf8 $(loadFile "dist/main.js") <>
                "var app = Elm.Main.init()"
-    , styleCss = LTE.encodeUtf8 . renderWith compact [] $
-                 h1 ?
-                 color "#fa0"
+    , styleCss =  style
     , backSvg = LBS.fromStrict $(embedFile "assets/back.svg")
     }
 
