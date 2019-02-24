@@ -46,7 +46,7 @@ executables:
 tests:
   klaraworks-test:
     main:                Spec.hs
-    source-dirs:         test
+    source-dirs:         server-test
     ghc-options:
     - -threaded
     - -rtsopts
