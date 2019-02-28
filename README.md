@@ -3,14 +3,14 @@
 ## TODO
 
 ### Infrastructure
-- [_] Try Terraform
+- [x] Try Terraform
 - [ ] Test environment
 - [ ] Deploy enbironment
 
 ### Server
-- [-] Hot loading
-- [-] Generate HTML/CSS
-- [-] Build elm when build haskell
+- [x] Hot loading
+- [x] Generate HTML/CSS
+- [x] Build elm when build haskell
 - [ ] Testing
 - [ ] Routing
 - [ ] API
@@ -28,7 +28,7 @@
 - [ ] Testing
 
 ### CI/CD
-- [-] Try Circle CI
-- [-] Auto testing
+- [x] Try Circle CI
+- [x] Auto testing
 - [ ] Auto deployment to test environment
 - [ ] Blue/Green deployment
