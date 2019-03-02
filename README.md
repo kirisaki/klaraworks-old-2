@@ -5,7 +5,7 @@
 ### Infrastructure
 - [x] Try Terraform
 - [ ] Test environment
-- [ ] Deploy enbironment
+- [ ] Deploy environment
 
 ### Server
 - [x] Hot loading
@@ -17,6 +17,7 @@
 - [ ] HTTP/2
 - [ ] Server push
 - [ ] Mail form
+- [ ] Generate OGP and images for it
 
 ### Frontend
 - [ ] Design
