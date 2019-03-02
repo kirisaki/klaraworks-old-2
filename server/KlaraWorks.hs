@@ -92,15 +92,17 @@ server Assets{..} req respond' =
             respond
             [("Content-Type", "application/vnd.klaraworks.works")]
             ( "\x22" <> "\x00\x02" <>
+              "\x0e" <> "20190301-lady2" <> "\x5c\x53\x0d\x6e" <> "\x00\x0c" <> "\227\129\172\227\129\132\227\129\172\227\129\132" <>
               "\x0e" <> "20190401-lady3" <> "\x5c\x53\x0d\x6e" <> "\x00\x06" <> "\229\176\145\229\165\179" <>
-              "\x0e" <> "20190301-lady2" <> "\x5c\x53\x0d\x6e" <> "\x00\x0c" <> "\227\129\172\227\129\132\227\129\172\227\129\132"
+              ""
             )
           "?eng" ->
             respond
             [("Content-Type", "application/vnd.klaraworks.works")]
             ( "\x22" <> "\x00\x02" <>
+              "\x0e" <> "20190301-lady2" <> "\x5c\x53\x0d\x6e" <> "\x00\x06" <> "Nuinui" <>
               "\x0e" <> "20190401-lady3" <> "\x5c\x53\x0d\x6e" <> "\x00\x06" <> "A Girl" <>
-              "\x0e" <> "20190301-lady2" <> "\x5c\x53\x0d\x6e" <> "\x00\x06" <> "Nuinui"
+              ""
             )
       _ ->
         respond

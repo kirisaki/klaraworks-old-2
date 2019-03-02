@@ -56,9 +56,9 @@ type alias WorkSummary =
      }
 
 init : () -> Url -> Key -> ( Model, Cmd Msg )
-init _ _ k =
+init _ u k =
     ( { key = k
-      , route = Index
+      , route = router u
       , language = Japanese
       , worksList = Nothing
       }
