@@ -8,7 +8,11 @@ import Html.Events exposing (..)
 import Random
 import Url exposing(Url)
 import Url.Parser as UP exposing((</>),Parser)
-
+import Http
+import Time
+import Bytes
+import Bytes.Decode as BD
+import Task exposing (..)
 
 main =
     Browser.application
@@ -35,23 +39,108 @@ type Language
 type Msg
     = Link UrlRequest
     | UrlChanged Url
+    | ReceiveWorksList (Result Http.Error (List WorkSummary))
     | NoOp
 
 type alias Model =
     { key : Key
     , route : Route
     , language : Language
+    , worksList : Maybe (List WorkSummary)
     }
+
+type alias WorkSummary =
+    { id_ : String
+    , time : Time.Posix
+    , title : String
+     }
 
 init : () -> Url -> Key -> ( Model, Cmd Msg )
 init _ _ k =
     ( { key = k
       , route = Index
       , language = Japanese
+      , worksList = Nothing
       }
-    , Cmd.none
+    , Task.attempt ReceiveWorksList (fetchWorksList Japanese)
     )
 
+languageTo3Code : Language -> String
+languageTo3Code l =
+    case l of
+        Japanese -> "jpn"
+        English -> "eng"
+
+
+apiDecoder : BD.Decoder a -> BD.Decoder a
+apiDecoder d =
+    BD.unsignedInt8 |> BD.andThen
+        (\status ->
+            case status of
+                0x22 -> d
+                _ -> BD.fail
+        )
+
+string8 : BD.Decoder String
+string8 =
+  BD.unsignedInt8
+    |> BD.andThen BD.string
+
+string16 : BD.Decoder String
+string16 =
+  BD.unsignedInt16 Bytes.BE
+    |> BD.andThen BD.string
+
+posix : BD.Decoder Time.Posix
+posix = BD.map (Time.millisToPosix << ((*) 1000)) <| BD.signedInt32 Bytes.BE
+
+fetchWorksList : Language -> Task Http.Error (List WorkSummary)
+fetchWorksList l =
+    let
+        list d =
+            BD.unsignedInt16 Bytes.BE
+                |> BD.andThen (\len -> BD.loop (len, []) (listStep d))
+        listStep d (n, xs) =
+            if n <= 0 then
+                BD.succeed (BD.Done xs)
+            else
+                BD.map (\x -> BD.Loop (n - 1, x :: xs)) d
+        summary = BD.map3 WorkSummary string8 posix string16
+        decoder = apiDecoder <| list summary
+    in
+        Http.task
+            { method = "GET"
+            , headers = []
+            , url = "/api/works?" ++ languageTo3Code l
+            , body = Http.emptyBody
+            , resolver = bytesResolver decoder
+            , timeout = Nothing
+            }
+
+bytesResolver : BD.Decoder a -> Http.Resolver Http.Error a
+bytesResolver decoder =
+    Http.bytesResolver <|
+        \response ->
+            case response of
+                Http.BadUrl_ url ->
+                    Err (Http.BadUrl url)
+
+                Http.Timeout_ ->
+                    Err Http.Timeout
+
+                Http.NetworkError_ ->
+                    Err Http.NetworkError
+
+                Http.BadStatus_ metadata body ->
+                    Err (Http.BadStatus metadata.statusCode)
+
+                Http.GoodStatus_ metadata body ->
+                    case BD.decode decoder body of
+                        Just value ->
+                            Ok value
+
+                        Nothing ->
+                            Err (Http.BadBody "fail parsing")
 router : Url -> Route
 router url =
     let
@@ -85,6 +174,16 @@ update msg model =
             ( { model | route = router url }
             , Cmd.none
             )
+        ReceiveWorksList res ->
+            case Debug.log "res" res of
+                Ok ws ->
+                    ( { model | worksList = Just ws }
+                    , Cmd.none
+                    )
+                Err _ ->
+                    ( model
+                    , Cmd.none
+                    )
 
         NoOp ->
             ( model
@@ -124,10 +223,13 @@ about : Model -> Html Msg
 about model = text "about"
 
 works : Model -> Html Msg
-works model = div []
-              [ a [ href "/works/1" ] [ text "1" ]
-              , a [ href "/works/2" ] [ text "2" ]
-              ]
+works model =
+    case model.worksList of
+        Just ws ->
+            div [] (List.map (\s -> h1 [] [ text s.title ]) ws)
+        _ ->
+            div [] [ text "nyaan!!!" ]
+
 
 contact : Model -> Html Msg
 contact model = text "contact"

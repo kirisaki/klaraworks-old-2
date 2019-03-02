@@ -7,6 +7,7 @@ import           KlaraWorks.Style
 import           KlaraWorks.TH
 import           Paths_klaraworks
 
+import           Control.Monad.IO.Class   (liftIO)
 import qualified Data.ByteString.Lazy     as LBS
 import           Data.FileEmbed           (embedFile)
 import qualified Data.Text                as ST
@@ -37,51 +38,46 @@ server Assets{..} req respond' =
         respond
         [("Content-Type", "image/svg+xml")]
         backSvg
-      ["api", "works"] ->
-        respond
-        [("Content-Type", "application/vnd.klaraworks.works")]
-        ( "\x0e" <> "20190401-lady3" <> "\x00\x0a" <> "The Lady 3" <> "\x00L\x00\x00\x00\x5c\x53\x0d\x6e" <>
-          "\x0e" <> "20190301-lady2" <> "\x00\x0a" <> "The Lady 2" <> "\x00L\x00\x00\x00\x5c\x53\x0d\x6e"
-        )
-      ["api", "works", x] ->
+      ["api", "works", x] -> do
+        liftIO $ print $ rawQueryString req
         case (x, rawQueryString req) of
-          ("20190401-lady3", "jpn") ->
+          ("20190401-lady3", "?jpn") ->
             respond
             [("Content-Type", "application/vnd.klaraworks.work-meta")]
             ( "\x22" <>
               "\x0e" <> "20190401-lady3" <>
               "\x00\x06" <> "\229\176\145\229\165\179" <>
-              "\x00L\x00\x00\x00\x5c\x53\x0d\x6e" <>
+              "\x5c\x53\x0d\x6e" <>
               "\x01" <>
               "\x00" <> ""
             )
-          ("20190401-lady3", "eng") ->
+          ("20190401-lady3", "?eng") ->
             respond
             [("Content-Type", "application/vnd.klaraworks.work-meta")]
             ( "\x22" <>
               "\x0e" <> "20190401-lady3" <>
               "\x00\x06" <> "A Girl" <>
-              "\x00L\x00\x00\x00\x5c\x53\x0d\x6e" <>
+              "\x5c\x53\x0d\x6e" <>
               "\x01" <>
               "\x00" <> ""
             )
-          ("20190401-lady2", "jpn") ->
+          ("20190401-lady2", "?jpn") ->
             respond
             [("Content-Type", "application/vnd.klaraworks.work-meta")]
             ( "\x22" <>
               "\x0e" <> "20190401-lady2" <>
               "\x00\x0c" <> "\227\129\172\227\129\132\227\129\172\227\129\132" <>
-              "\x00L\x00\x00\x00\x5c\x53\x0d\x6e" <>
+              "\x5c\x53\x0d\x6e" <>
               "\x01" <>
               "\x18" <> "\232\137\166\233\154\138\227\129\147\227\130\140\227\129\143\227\129\151\227\130\135\227\130\147"
             )
-          ("20190401-lady2", "eng") ->
+          ("20190401-lady2", "?eng") ->
             respond
             [("Content-Type", "application/vnd.klaraworks.work-meta")]
             ( "\x22" <>
               "\x0e" <> "20190401-lady2" <>
               "\x00\x06" <> "Nuinui" <>
-              "\x00L\x00\x00\x00\x5c\x53\x0d\x6e" <>
+              "\x5c\x53\x0d\x6e" <>
               "\x01" <>
               "\x11" <> "Kantai Collection"
             )
@@ -90,6 +86,22 @@ server Assets{..} req respond' =
             responseLBS status404
             [("Content-Type", "application/vnd.klaraworks.work-meta")]
             "\x44"
+      ["api", "works"] ->
+        case rawQueryString req of
+          "?jpn" ->
+            respond
+            [("Content-Type", "application/vnd.klaraworks.works")]
+            ( "\x22" <> "\x00\x02" <>
+              "\x0e" <> "20190401-lady3" <> "\x5c\x53\x0d\x6e" <> "\x00\x06" <> "\229\176\145\229\165\179" <>
+              "\x0e" <> "20190301-lady2" <> "\x5c\x53\x0d\x6e" <> "\x00\x0c" <> "\227\129\172\227\129\132\227\129\172\227\129\132"
+            )
+          "?eng" ->
+            respond
+            [("Content-Type", "application/vnd.klaraworks.works")]
+            ( "\x22" <> "\x00\x02" <>
+              "\x0e" <> "20190401-lady3" <> "\x5c\x53\x0d\x6e" <> "\x00\x06" <> "A Girl" <>
+              "\x0e" <> "20190301-lady2" <> "\x5c\x53\x0d\x6e" <> "\x00\x06" <> "Nuinui"
+            )
       _ ->
         respond
         [("Content-Type", "text/html")]
