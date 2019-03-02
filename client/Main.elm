@@ -20,11 +20,6 @@ main =
     , onUrlChange = UrlChanged
     }
 
-type alias Model =
-    { key : Key
-    , route : Route
-    , language : Language
-    }
 
 type Route
     = Index
@@ -41,6 +36,12 @@ type Msg
     = Link UrlRequest
     | UrlChanged Url
     | NoOp
+
+type alias Model =
+    { key : Key
+    , route : Route
+    , language : Language
+    }
 
 init : () -> Url -> Key -> ( Model, Cmd Msg )
 init _ _ k =
