@@ -14,7 +14,7 @@
 - [ ] Testing
 - [x] Routing
 - [x] API
-- [ ] HTTP/2
+- [x] HTTP/2
 - [ ] Server push
 - [ ] Mail form
 - [ ] Generate OGP and images for it
