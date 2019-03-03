@@ -12,16 +12,17 @@
 - [x] Generate HTML/CSS
 - [x] Build elm when build haskell
 - [ ] Testing
-- [ ] Routing
-- [ ] API
+- [x] Routing
+- [x] API
 - [ ] HTTP/2
 - [ ] Server push
 - [ ] Mail form
 - [ ] Generate OGP and images for it
 
 ### Frontend
-- [ ] Design
-- [ ] Routing
+- [ ] Basic design
+- [ ] Figure generation
+- [x] Routing
 - [ ] Modal window
 - [ ] Image viewer
 - [ ] Mail form
