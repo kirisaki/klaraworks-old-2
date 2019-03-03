@@ -46,8 +46,8 @@ server Assets{..} req respond' =
             [("Content-Type", "application/vnd.klaraworks.work-meta")]
             ( "\x22" <>
               "\x0e" <> "20190401-lady3" <>
-              "\x00\x06" <> "\229\176\145\229\165\179" <>
               "\x5c\x53\x0d\x6e" <>
+              "\x00\x06" <> "\229\176\145\229\165\179" <>
               "\x00" <> "" <>
               "\x01" <> "\x12" <> "20190401-lady3.jpg"
             )
@@ -56,28 +56,28 @@ server Assets{..} req respond' =
             [("Content-Type", "application/vnd.klaraworks.work-meta")]
             ( "\x22" <>
               "\x0e" <> "20190401-lady3" <>
-              "\x00\x06" <> "A Girl" <>
               "\x5c\x53\x0d\x6e" <>
+              "\x00\x06" <> "A Girl" <>
               "\x00" <> "" <>
               "\x01" <> "\x12" <> "20190401-lady3.jpg"
             )
-          ("20190401-lady2", "?jpn") ->
+          ("20190301-lady2", "?jpn") ->
             respond
             [("Content-Type", "application/vnd.klaraworks.work-meta")]
             ( "\x22" <>
               "\x0e" <> "20190401-lady2" <>
-              "\x00\x0c" <> "\227\129\172\227\129\132\227\129\172\227\129\132" <>
               "\x5c\x53\x0d\x6e" <>
+              "\x00\x0c" <> "\227\129\172\227\129\132\227\129\172\227\129\132" <>
               "\x18" <> "\232\137\166\233\154\138\227\129\147\227\130\140\227\129\143\227\129\151\227\130\135\227\130\147" <>
               "\x01" <> "\x12" <> "20190401-lady2.jpg"
             )
-          ("20190401-lady2", "?eng") ->
+          ("20190301-lady2", "?eng") ->
             respond
             [("Content-Type", "application/vnd.klaraworks.work-meta")]
             ( "\x22" <>
+              "\x5c\x53\x0d\x6e" <>
               "\x0e" <> "20190401-lady2" <>
               "\x00\x06" <> "Nuinui" <>
-              "\x5c\x53\x0d\x6e" <>
               "\x11" <> "Kantai Collection" <>
               "\x01" <> "\x12" <> "20190401-lady2.jpg"
             )

@@ -1,6 +1,7 @@
 module Types exposing
     ( Route(..)
     , Language(..)
+    , UrlEvent(..)
     , Msg(..)
     , Model
     , WorkSummary
@@ -14,7 +15,7 @@ import Http
 import Url exposing(Url)
 import Browser.Navigation exposing (Key)
 import Browser exposing (UrlRequest)
-
+import Dict exposing (Dict)
 
 type Route
     = Index
@@ -27,10 +28,15 @@ type Language
     = Japanese
     | English
 
+type UrlEvent
+    = Internal
+    | External
+    | UrlChanged
+
 type Msg
-    = Link UrlRequest
-    | UrlChanged Url
+    = Link UrlEvent Url
     | ReceiveWorksList (Result Http.Error (List WorkSummary))
+    | ReceiveWorkDetail (Result Http.Error WorkDetail)
     | NoOp
 
 type alias Model =
@@ -38,6 +44,7 @@ type alias Model =
     , route : Route
     , language : Language
     , worksList : Maybe (List WorkSummary)
+    , worksDetails : Dict String WorkDetail
     }
 
 type alias WorkSummary =

@@ -12,6 +12,7 @@ import Random
 import Url exposing(Url)
 import Url.Parser as UP exposing((</>),Parser)
 import Task
+import Dict exposing (Dict)
 
 main =
     Browser.application
@@ -19,10 +20,20 @@ main =
     , view = view
     , update = update
     , subscriptions = subscriptions
-    , onUrlRequest = Link
-    , onUrlChange = UrlChanged
+    , onUrlRequest = onUrlRequest
+    , onUrlChange = Link UrlChanged
     }
 
+
+onUrlRequest : UrlRequest -> Msg
+onUrlRequest req =
+    case req of
+        Browser.Internal url ->
+            Link Internal url
+        Browser.External str ->
+            case Url.fromString str of
+                Just url -> Link External url
+                _ -> NoOp
 
 init : () -> Url -> Key -> ( Model, Cmd Msg )
 init _ u k =
@@ -30,6 +41,7 @@ init _ u k =
       , route = router u
       , language = Japanese
       , worksList = Nothing
+      , worksDetails = Dict.empty
       }
     , Task.attempt ReceiveWorksList (Fetch.worksList Japanese)
     )
@@ -53,24 +65,44 @@ router url =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        Link req ->
-            case req of
-                Browser.Internal url ->
-                    ( { model | route = router url }
-                    , Nav.pushUrl model.key (Url.toString url)
-                    )
-                Browser.External url ->
-                    ( model
-                    , Nav.load url
-                    )
-        UrlChanged url ->
-            ( { model | route = router url }
-            , Cmd.none
-            )
+        Link event url ->
+            let
+                newRoute = router url
+                newModel = { model | route = newRoute }
+                newCmd =
+                    case (event, newRoute) of
+                        (Internal, Works Nothing) ->
+                            Cmd.batch
+                                [ Task.attempt ReceiveWorksList (Fetch.worksList model.language)
+                                , Nav.pushUrl model.key (Url.toString url)
+                                ]
+                        (Internal, Works (Just i)) ->
+                            Cmd.batch
+                                [ Task.attempt ReceiveWorkDetail (Fetch.workDetail i model.language)
+                                , Nav.pushUrl model.key (Url.toString url)
+                                ]
+                        (Internal, _) ->
+                                Nav.pushUrl model.key (Url.toString url)
+                        (External, _) ->
+                            Nav.load (Url.toString url)
+                        (UrlChanged, _) ->
+                            Cmd.none
+            in
+                (newModel, newCmd)
         ReceiveWorksList res ->
             case Debug.log "res" res of
                 Ok ws ->
                     ( { model | worksList = Just ws }
+                    , Cmd.none
+                    )
+                Err _ ->
+                    ( model
+                    , Cmd.none
+                    )
+        ReceiveWorkDetail res ->
+            case Debug.log "res" res of
+                Ok wd ->
+                    ( { model | worksDetails = Dict.insert wd.id_ wd model.worksDetails }
                     , Cmd.none
                     )
                 Err _ ->
@@ -119,7 +151,7 @@ works : Model -> Html Msg
 works model =
     case model.worksList of
         Just ws ->
-            div [] (List.map (\s -> h1 [] [ text s.title ]) ws)
+            div [] (List.map (\s -> a [ href ("/works/" ++ s.id_)] [ text s.title ]) ws)
         _ ->
             div [] [ text "nyaan!!!" ]
 
