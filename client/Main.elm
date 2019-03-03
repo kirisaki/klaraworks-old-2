@@ -130,7 +130,10 @@ view model =
                       Index -> index model
                       About -> about model
                       Works Nothing -> works model
-                      Works _ -> notFound model
+                      Works (Just i) ->
+                          case Dict.get i (Debug.log "details" model.worksDetails) of
+                              Just d -> workAt d
+                              Nothing -> notFound model
                       Contact -> contact model
                       NotFound -> notFound model
                 , a [ href "/" ] [ text "index" ]
@@ -155,6 +158,9 @@ works model =
         _ ->
             div [] [ text "nyaan!!!" ]
 
+workAt : WorkDetail -> Html Msg
+workAt detail =
+    text detail.title
 
 contact : Model -> Html Msg
 contact model = text "contact"

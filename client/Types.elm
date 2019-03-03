@@ -66,6 +66,6 @@ type alias WorkDetail =
     , time : Time.Posix
     , title : String
     , origin : Maybe String
-    , contets : Contents
+    , contents : Contents
      }
 
