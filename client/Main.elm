@@ -36,15 +36,26 @@ onUrlRequest req =
                 _ -> NoOp
 
 init : () -> Url -> Key -> ( Model, Cmd Msg )
-init _ u k =
-    ( { key = k
-      , route = router u
-      , language = Japanese
-      , worksList = Nothing
-      , worksDetails = Dict.empty
-      }
-    , Task.attempt ReceiveWorksList (Fetch.worksList Japanese)
-    )
+init _ url k =
+    let
+        initRoute = router url
+        initCmd =
+            case initRoute of
+                Works Nothing ->
+                    Task.attempt ReceiveWorksList (Fetch.worksList Japanese)
+                Works (Just i) ->
+                    Task.attempt ReceiveWorkDetail (Fetch.workDetail i Japanese)
+                _ ->
+                    Cmd.none
+    in
+        ( { key = k
+          , route = router url
+          , language = Japanese
+          , worksList = Nothing
+          , worksDetails = Dict.empty
+          }
+        , initCmd
+        )
 
 router : Url -> Route
 router url =
