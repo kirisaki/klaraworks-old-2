@@ -1,5 +1,8 @@
 module Main exposing (main)
 
+import Types exposing (..)
+import Fetch
+
 import Browser exposing (UrlRequest, Document)
 import Browser.Navigation as Nav exposing( Key)
 import Html exposing (..)
@@ -8,11 +11,7 @@ import Html.Events exposing (..)
 import Random
 import Url exposing(Url)
 import Url.Parser as UP exposing((</>),Parser)
-import Http
-import Time
-import Bytes
-import Bytes.Decode as BD
-import Task exposing (..)
+import Task
 
 main =
     Browser.application
@@ -25,52 +24,6 @@ main =
     }
 
 
-type Route
-    = Index
-    | About
-    | Works (Maybe String)
-    | Contact
-    | NotFound
-
-type Language
-    = Japanese
-    | English
-
-type Msg
-    = Link UrlRequest
-    | UrlChanged Url
-    | ReceiveWorksList (Result Http.Error (List WorkSummary))
-    | NoOp
-
-type alias Model =
-    { key : Key
-    , route : Route
-    , language : Language
-    , worksList : Maybe (List WorkSummary)
-    }
-
-type alias WorkSummary =
-    { id_ : String
-    , time : Time.Posix
-    , title : String
-     }
-
-type Direction
-    = ToRight
-    | ToLeft
-
-type Contents
-    = Picture String
-    | Comic Direction (List String)
-
-type alias WorkDetail =
-    { id_ : String
-    , time : Time.Posix
-    , title : String
-    , origin : Maybe String
-    , contets : Contents
-     }
-
 init : () -> Url -> Key -> ( Model, Cmd Msg )
 init _ u k =
     ( { key = k
@@ -78,132 +31,9 @@ init _ u k =
       , language = Japanese
       , worksList = Nothing
       }
-    , Task.attempt ReceiveWorksList (fetchWorksList Japanese)
+    , Task.attempt ReceiveWorksList (Fetch.worksList Japanese)
     )
 
-languageTo3Code : Language -> String
-languageTo3Code l =
-    case l of
-        Japanese -> "jpn"
-        English -> "eng"
-
-
-apiDecoder : BD.Decoder a -> BD.Decoder a
-apiDecoder d =
-    BD.unsignedInt8 |> BD.andThen
-        (\status ->
-            case status of
-                0x22 -> d
-                _ -> BD.fail
-        )
-
-string8 : BD.Decoder String
-string8 =
-  BD.unsignedInt8
-    |> BD.andThen BD.string
-
-string16 : BD.Decoder String
-string16 =
-  BD.unsignedInt16 Bytes.BE
-    |> BD.andThen BD.string
-
-posix : BD.Decoder Time.Posix
-posix = BD.map (Time.millisToPosix << ((*) 1000)) <| BD.signedInt32 Bytes.BE
-
-list16 : BD.Decoder a -> BD.Decoder (List a)
-list16 d =
-    let
-        listStep d1 (n, xs) =
-            if n <= 0 then
-                BD.succeed (BD.Done xs)
-            else
-                BD.map (\x -> BD.Loop (n - 1, x :: xs)) d1
-    in
-        BD.unsignedInt16 Bytes.BE
-            |> BD.andThen (\len -> BD.loop (len, []) (listStep d))
-
-fetchWorksList : Language -> Task Http.Error (List WorkSummary)
-fetchWorksList l =
-    let
-        summary = BD.map3 WorkSummary string8 posix string16
-        decoder = apiDecoder <| list16 summary
-    in
-        Http.task
-            { method = "GET"
-            , headers = []
-            , url = "/api/works?" ++ languageTo3Code l
-            , body = Http.emptyBody
-            , resolver = bytesResolver decoder
-            , timeout = Nothing
-            }
-
-fetchWorkDetail : String -> Language -> Task Http.Error WorkDetail
-fetchWorkDetail i l =
-    let
-        origin =
-            string8
-                |> BD.andThen
-                   (\str ->
-                        case str of
-                            "" -> BD.succeed Nothing
-                            x -> BD.succeed <| Just x
-                   )
-        contents =
-            BD.unsignedInt8
-                |> BD.andThen
-                   (\t ->
-                       case t of
-                           0x01 ->
-                               BD.map Picture string8
-                           0x02 ->
-                               BD.map (Comic ToRight) (list16 string8)
-                           0x03 ->
-                               BD.map (Comic ToLeft) (list16 string8)
-                           _ -> BD.fail
-                   )
-        detail =
-            BD.map5 WorkDetail
-                string8
-                posix
-                string16
-                origin
-                contents
-        decoder = apiDecoder <| detail
-    in
-        Http.task
-            { method = "GET"
-            , headers = []
-            , url = "/api/works/" ++ i ++ "?" ++ languageTo3Code l
-            , body = Http.emptyBody
-            , resolver = bytesResolver decoder
-            , timeout = Nothing
-            }
-
-
-bytesResolver : BD.Decoder a -> Http.Resolver Http.Error a
-bytesResolver decoder =
-    Http.bytesResolver <|
-        \response ->
-            case response of
-                Http.BadUrl_ url ->
-                    Err (Http.BadUrl url)
-
-                Http.Timeout_ ->
-                    Err Http.Timeout
-
-                Http.NetworkError_ ->
-                    Err Http.NetworkError
-
-                Http.BadStatus_ metadata body ->
-                    Err (Http.BadStatus metadata.statusCode)
-
-                Http.GoodStatus_ metadata body ->
-                    case BD.decode decoder body of
-                        Just value ->
-                            Ok value
-
-                        Nothing ->
-                            Err (Http.BadBody "fail parsing")
 router : Url -> Route
 router url =
     let
