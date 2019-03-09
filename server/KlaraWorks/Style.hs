@@ -56,6 +56,7 @@ index =  renderBS $
   doctypehtml_ $ do
   head_ $ do
     meta_ [ charset_ "utf-8" ]
+    meta_ [ name_ "viewport", content_ "width=device-width,initial-scale=1" ]
     title_ [] "Klara Works"
     style_ [] $ LTE.encodeUtf8 . renderWith compact [] $ do
       body ? do
@@ -63,6 +64,11 @@ index =  renderBS $
         backgroundImage $ url "back.svg"
         color kWhite
         overflow hidden
+        position fixed
+        top nil
+        bottom nil
+        left nil
+        right nil
       ".container" ? do
         width (vw 400)
         height (vh 100)
