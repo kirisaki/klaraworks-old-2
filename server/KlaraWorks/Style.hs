@@ -5,6 +5,7 @@ module KlaraWorks.Style
   ) where
 
 import           Clay                    hiding (div, style)
+import qualified Clay                    as C (div)
 import qualified Data.ByteString.Lazy    as LBS
 import qualified Data.Text               as ST
 import qualified Data.Text.Lazy.Encoding as LTE
@@ -24,15 +25,31 @@ kWhite = rgb' 0xf0f0f0
 kPink = rgb' 0xfc2063
 kPeach = rgb' 0xfd5185
 
+kEase :: Css
+kEase = transition "" (sec 0.2) easeOut (sec 0)
+
 
 style :: LBS.ByteString
 style = LTE.encodeUtf8 . renderWith compact [] $ do
-  body ? do
-    backgroundColor kDark
-    backgroundImage $ url "back.svg"
-    color white
-  h1 ?
-    color "#fa0"
+  a ?
+    color kWhite
+  nav ? do
+    position absolute
+    right (px 100)
+    bottom (px 100)
+  ".container" |>
+    C.div ? do
+      width (vw 100)
+      height (vh 100)
+  ".container.index" ?
+    left (vw 0)
+  ".container.about" ?
+    left (vw (-100))
+  ".container.works" ?
+    left (vw (-200))
+  ".container.contact" ?
+    left (vw (-300))
+
 
 index :: LBS.ByteString
 index =  renderBS $
@@ -41,9 +58,17 @@ index =  renderBS $
     meta_ [ charset_ "utf-8" ]
     title_ [] "Klara Works"
     style_ [] $ LTE.encodeUtf8 . renderWith compact [] $ do
+      body ? do
+        backgroundColor kDark
+        backgroundImage $ url "back.svg"
+        color kWhite
+        overflow hidden
       ".container" ? do
-        width (vw 100)
+        width (vw 400)
         height (vh 100)
+        display flex
+        position absolute
+        kEase
       (body <> h1) ?
         margin nil nil nil nil
     link_  [rel_ "stylesheet", href_ "/style.css"]

@@ -136,47 +136,51 @@ view : Model -> Document Msg
 view model =
     { title = "Klara Works"
     , body =
-          [ div [ class "container" ]
-                [ case model.route of
-                      Index -> index model
-                      About -> about model
-                      Works Nothing -> works model
-                      Works (Just i) ->
-                          case Dict.get i (Debug.log "details" model.worksDetails) of
-                              Just d -> workAt d
-                              Nothing -> notFound model
-                      Contact -> contact model
-                      NotFound -> notFound model
-                , a [ href "/" ] [ text "index" ]
-                , a [ href "/about" ] [ text "about" ]
-                , a [ href "/works" ] [ text "works" ]
-                , a [ href "/contact" ] [ text "contact" ]
+          [ div [ classList
+                      [ ( "container", True )
+                      , ( case model.route of
+                              Index -> "index"
+                              About -> "about"
+                              Works _ -> "works"
+                              Contact -> "contact"
+                              _ -> ""
+                        , True )
+                      ]
                 ]
+                [ index model
+                , about model
+                , works model
+                , contact model
+                ]
+          , nav []
+              [ a [ href "/" ] [ text "index" ]
+              , a [ href "/about" ] [ text "about" ]
+              , a [ href "/works" ] [ text "works" ]
+              , a [ href "/contact" ] [ text "contact" ]
+              ]
           ]
     }
 
 index : Model -> Html Msg
-index model = text "index"
+index model = div []
+              [ text "index" ]
 
 about : Model -> Html Msg
-about model = text "about"
+about model = div []
+              [ text "about"
+              ]
 
 works : Model -> Html Msg
-works model =
-    case model.worksList of
-        Just ws ->
-            div [] (List.map (\s -> a [ href ("/works/" ++ s.id_)] [ text s.title ]) ws)
-        _ ->
-            div [] [ text "nyaan!!!" ]
-
-workAt : WorkDetail -> Html Msg
-workAt detail =
-    text detail.title
+works model = div []
+              [ text "works"
+              ]
 
 contact : Model -> Html Msg
-contact model = text "contact"
-
-
+contact model = div []
+                [ text "contact"
+                ]
 
 notFound : Model -> Html Msg
-notFound model = text "nyaan..."
+notFound model = div []
+                 [ text "nyaan..."
+                 ]
