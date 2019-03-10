@@ -53,7 +53,7 @@ styleNav = do
     position absolute
     width (vw 40)
     height (rem 2)
-    top (rem 1.5)
+    top (rem 1.7)
     right (vw 2)
     query CM.screen [CM.maxAspectRatio (1, 1)] $ do
       left (vw (-5))
@@ -87,7 +87,7 @@ styleRouting = do
     C.div ? do
       width (vw 100)
       height (vh 100 @-@ rem 2)
-      top (rem 3.5)
+      top (rem 3.7)
       position relative
   ".container.index" ?
     left (vw 0)
@@ -101,16 +101,15 @@ styleRouting = do
 styleSetting :: Css
 styleSetting = do
   ".setting" ? do
-    height (rem 1.5)
+    height (rem 1.7)
     top nil
-    right (rem 1)
+    right nil
     position absolute
     fontSize kSmall
     display flex
   ".setting" |> li ? do
-    lineHeight (rem 1.5)
+    lineHeight (rem 1.7)
     display block
-    lineHeight (rem 1.5)
     padding nil nil nil (rem 1)
   ".language_selector, .seed" ? do
     color kWhite

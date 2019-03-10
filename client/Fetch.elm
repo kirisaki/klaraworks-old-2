@@ -3,19 +3,13 @@ module Fetch exposing
     , workDetail
     )
 import Types exposing(..)
+import Codec
 
 import Http
 import Time
 import Bytes
 import Bytes.Decode as BD
 import Task exposing (..)
-
-
-languageTo3Code : Language -> String
-languageTo3Code l =
-    case l of
-        Japanese -> "jpn"
-        English -> "eng"
 
 
 apiDecoder : BD.Decoder a -> BD.Decoder a
@@ -61,7 +55,7 @@ worksList l =
         Http.task
             { method = "GET"
             , headers = []
-            , url = "/api/works?" ++ languageTo3Code l
+            , url = "/api/works?" ++ Codec.languageTo3Code l
             , body = Http.emptyBody
             , resolver = bytesResolver decoder
             , timeout = Nothing
@@ -103,7 +97,7 @@ workDetail i l =
         Http.task
             { method = "GET"
             , headers = []
-            , url = "/api/works/" ++ i ++ "?" ++ languageTo3Code l
+            , url = "/api/works/" ++ i ++ "?" ++ Codec.languageTo3Code l
             , body = Http.emptyBody
             , resolver = bytesResolver decoder
             , timeout = Nothing
