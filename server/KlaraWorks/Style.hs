@@ -6,6 +6,7 @@ module KlaraWorks.Style
 
 import           Clay                    hiding (div, style)
 import qualified Clay                    as C (div)
+import qualified Clay.Media              as CM
 import qualified Data.ByteString.Lazy    as LBS
 import qualified Data.Text               as ST
 import qualified Data.Text.Lazy.Encoding as LTE
@@ -40,14 +41,17 @@ styleNav = do
     position absolute
   nav |> ul ? do
     position absolute
-    width (vw 100)
+    width (vw 40)
     height (em 2)
     top nil
-    left nil
+    right (vw (-98))
     display flex
     justifyContent spaceBetween
+    query CM.screen [CM.maxAspectRatio (1, 1)] $ do
+      left (vw (-5))
+      width (vw 110)
   nav |> ul |> a ? do
-    width (vw 24)
+    width (pct 24)
     height (pct 100)
     display block
     textAlign center
@@ -60,6 +64,8 @@ styleNav = do
     textDecoration none
     transform $ skewX (deg 135)
   nav |> ul |> a |> li ? do
+    display block
+    transform $ skewX (deg (-135))
     display block
     transform $ skewX (deg (-135))
   ".container" |>
