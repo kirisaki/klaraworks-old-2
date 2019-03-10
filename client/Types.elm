@@ -37,6 +37,8 @@ type Msg
     = Link UrlEvent Url
     | ReceiveWorksList (Result Http.Error (List WorkSummary))
     | ReceiveWorkDetail (Result Http.Error WorkDetail)
+    | LanguageChanged Language
+    | Trace String
     | NoOp
 
 type alias Model =

@@ -1,12 +1,14 @@
 module View exposing (view)
 
 import Types exposing(..)
+import Codec
 
 import Browser exposing (Document)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import String
+import Json.Decode as JD
 
 view : Model -> Document Msg
 view model =
@@ -49,7 +51,7 @@ setting model =
     ul [ class "setting" ]
     [ li [][ div []
                  [ text "language: "
-                 , select [ class "language_selector" ]
+                 , select [ class "language_selector",  on "change" Codec.languageDecoder ]
                      [ option [ value "jpn", selected (model.language == Japanese) ] [ text "日本語" ]
                      , option [ value "eng", selected (model.language == English) ] [ text "English" ]
                      ]

@@ -100,7 +100,7 @@ update msg model =
             in
                 (newModel, newCmd)
         ReceiveWorksList res ->
-            case Debug.log "res" res of
+            case res of
                 Ok ws ->
                     ( { model | worksList = Just ws }
                     , Cmd.none
@@ -110,7 +110,7 @@ update msg model =
                     , Cmd.none
                     )
         ReceiveWorkDetail res ->
-            case Debug.log "res" res of
+            case res of
                 Ok wd ->
                     ( { model | worksDetails = Dict.insert wd.id_ wd model.worksDetails }
                     , Cmd.none
@@ -119,7 +119,11 @@ update msg model =
                     ( model
                     , Cmd.none
                     )
+        LanguageChanged l ->
+            ( { model | language = l }, Cmd.none )
 
+        Trace str ->
+            ( Debug.log str model, Cmd.none )
         NoOp ->
             ( model
             , Cmd.none
