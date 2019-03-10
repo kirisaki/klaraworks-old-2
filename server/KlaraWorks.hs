@@ -39,6 +39,10 @@ server Assets{..} req respond' =
         respond
         [("Content-Type", "image/svg+xml")]
         backSvg
+      ["klaraworks.svg"] ->
+        respond
+        [("Content-Type", "image/svg+xml")]
+        klaraworksSvg
       ["api", "works", x] -> do
         liftIO $ print $ rawQueryString req
         case (x, rawQueryString req) of
@@ -112,10 +116,11 @@ server Assets{..} req respond' =
 
 
 data Assets = Assets
-  { indexHtml :: LBS.ByteString
-  , mainJs    :: LBS.ByteString
-  , styleCss  :: LBS.ByteString
-  , backSvg   :: LBS.ByteString
+  { indexHtml     :: LBS.ByteString
+  , mainJs        :: LBS.ByteString
+  , styleCss      :: LBS.ByteString
+  , backSvg       :: LBS.ByteString
+  , klaraworksSvg :: LBS.ByteString
   }
 
 boot :: IO ()
@@ -129,6 +134,7 @@ boot = do
                "var app = Elm.Main.init();"
     , styleCss =  style
     , backSvg = LBS.fromStrict $(embedFile "assets/back.svg")
+    , klaraworksSvg = LBS.fromStrict $(embedFile "assets/klaraworks.svg")
     }
 
 

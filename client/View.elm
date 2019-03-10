@@ -63,8 +63,8 @@ setting model =
     ]
 
 index : Model -> Html Msg
-index model = div []
-              [ text "index" ]
+index model = div [ class "index" ]
+              [ h1 [] [ span [] [ text "Klara Works" ]  ] ]
 
 about : Model -> Html Msg
 about model = div []

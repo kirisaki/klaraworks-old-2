@@ -11,7 +11,7 @@ import qualified Data.ByteString.Lazy    as LBS
 import qualified Data.Text               as ST
 import qualified Data.Text.Lazy.Encoding as LTE
 import           Lucid
-import           Prelude                 hiding (rem)
+import           Prelude                 hiding (rem, span)
 
 rgb' :: Integer -> Color
 rgb' hex = rgb r g b
@@ -46,6 +46,7 @@ style = LTE.encodeUtf8 . renderWith compact [] $ do
   styleNav
   styleSetting
   styleRouting
+  styleIndex
 
 styleNav :: Css
 styleNav = do
@@ -103,7 +104,7 @@ styleSetting = do
   ".setting" ? do
     height (rem 1.7)
     top nil
-    right nil
+    right (rem 0.5)
     position absolute
     fontSize kSmall
     display flex
@@ -119,6 +120,23 @@ styleSetting = do
   ".language_selector" |> option ? do
     backgroundColor kDark
     fontFamily ["futura-pt", "a-otf-ud-shin-go-pr6n"] [sansSerif]
+  ".seed" ?
+    textAlign end
+
+styleIndex :: Css
+styleIndex = do
+  ".container" |> ".index" |> h1 ? do
+    position absolute
+    width $ rem 13
+    height $ rem 3
+    top $ pct 40
+    right $ rem 1
+    backgroundColor transparent
+    backgroundImage $ url "klaraworks.svg"
+    backgroundRepeat noRepeat
+    display block
+  ".container" |> ".index" |> h1 |> span ?
+    display none
 
 index :: LBS.ByteString
 index =  renderBS $
