@@ -32,6 +32,10 @@ style :: LBS.ByteString
 style = LTE.encodeUtf8 . renderWith compact [] $ do
   a ?
     color kWhite
+  styleNav
+
+styleNav :: Css
+styleNav = do
   nav ?
     position absolute
   nav |> ul ? do
@@ -53,6 +57,7 @@ style = LTE.encodeUtf8 . renderWith compact [] $ do
     borderColor kWhite
     borderWidth (px 1)
     borderStyle solid
+    textDecoration none
     transform $ skewX (deg 135)
   nav |> ul |> a |> li ? do
     display block
@@ -91,6 +96,7 @@ index =  renderBS $
         bottom nil
         left nil
         right nil
+        fontFamily ["futura-pt", "a-otf-ud-shin-go-pr6n"] [sansSerif]
       ".container" ? do
         width (vw 400)
         height (vh 100)
@@ -101,6 +107,7 @@ index =  renderBS $
         margin nil nil nil nil
         padding nil nil nil nil
     link_  [rel_ "stylesheet", href_ "/style.css"]
+    script_ "(function(d){var config={kitId:'lve6akb',scriptTimeout: 3000,async: true}, h=d.documentElement,t=setTimeout(function(){h.className=h.className.replace(/\bwf-loading\b/g,'')+' wf-inactive';},config.scriptTimeout),tk=d.createElement('script'),f=false,s=d.getElementsByTagName('script')[0],a;h.className+=' wf-loading';tk.src='https://use.typekit.net/'+config.kitId+'.js';tk.async=true;tk.onload=tk.onreadystatechange=function(){a=this.readyState;if(f||a&&a!='complete'&&a!='loaded')return;f=true;clearTimeout(t);try{Typekit.load(config)}catch(e){}};s.parentNode.insertBefore(tk,s)})(document);"
   body_ $ do
     div_ [id_ "main"] ""
     script_ [src_ "/main.js"] ST.empty

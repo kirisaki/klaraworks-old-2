@@ -126,7 +126,7 @@ boot = do
   runTLS t s . server $ Assets
     { indexHtml = index
     , mainJs = LTE.encodeUtf8 $(loadFile "dist/main.js") <>
-               "var app = Elm.Main.init()"
+               "var app = Elm.Main.init();"
     , styleCss =  style
     , backSvg = LBS.fromStrict $(embedFile "assets/back.svg")
     }
