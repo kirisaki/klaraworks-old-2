@@ -41,6 +41,7 @@ type Msg
 
 type alias Model =
     { key : Key
+    , seed : Int
     , route : Route
     , language : Language
     , worksList : Maybe (List WorkSummary)

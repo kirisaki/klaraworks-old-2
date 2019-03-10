@@ -112,7 +112,7 @@ styleSetting = do
     display block
     lineHeight (rem 1.5)
     padding nil nil nil (rem 1)
-  ".language_selector" ? do
+  ".language_selector, .seed" ? do
     color kWhite
     backgroundColor transparent
     borderStyle none
