@@ -153,10 +153,12 @@ view model =
                 , contact model
                 ]
           , nav []
-              [ a [ href "/" ] [ text "index" ]
-              , a [ href "/about" ] [ text "about" ]
-              , a [ href "/works" ] [ text "works" ]
-              , a [ href "/contact" ] [ text "contact" ]
+              [ ul []
+                [ a [ href "/" ] [ li [] [ text "index" ] ]
+                , a [ href "/about" ] [ li [] [ text "about" ] ]
+                , a [ href "/works" ] [ li [] [ text "works" ] ]
+                , a [ href "/contact" ] [ li [] [ text "contact" ] ]
+                ]
               ]
           ]
     }

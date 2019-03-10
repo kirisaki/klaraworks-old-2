@@ -28,19 +28,41 @@ kPeach = rgb' 0xfd5185
 kEase :: Css
 kEase = transition "" (sec 0.2) easeOut (sec 0)
 
-
 style :: LBS.ByteString
 style = LTE.encodeUtf8 . renderWith compact [] $ do
   a ?
     color kWhite
-  nav ? do
+  nav ?
     position absolute
-    right (px 100)
-    bottom (px 100)
+  nav |> ul ? do
+    position absolute
+    width (vw 100)
+    height (em 2)
+    top nil
+    left nil
+    display flex
+    justifyContent spaceBetween
+  nav |> ul |> a ? do
+    width (vw 24)
+    height (pct 100)
+    display block
+    textAlign center
+    lineHeight (em 1.7)
+    boxSizing borderBox
+    padding nil (em 0.1) nil (em 0.1)
+    borderColor kWhite
+    borderWidth (px 1)
+    borderStyle solid
+    transform $ skewX (deg 135)
+  nav |> ul |> a |> li ? do
+    display block
+    transform $ skewX (deg (-135))
   ".container" |>
     C.div ? do
       width (vw 100)
-      height (vh 100)
+      height (vh 100 @-@ em 2)
+      top (em 2)
+      position relative
   ".container.index" ?
     left (vw 0)
   ".container.about" ?
@@ -75,8 +97,9 @@ index =  renderBS $
         display flex
         position absolute
         kEase
-      (body <> h1) ?
+      (body <> h1 <> nav <> C.div <> ul) ? do
         margin nil nil nil nil
+        padding nil nil nil nil
     link_  [rel_ "stylesheet", href_ "/style.css"]
   body_ $ do
     div_ [id_ "main"] ""
