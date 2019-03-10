@@ -112,6 +112,14 @@ styleSetting = do
     display block
     lineHeight (rem 1.5)
     padding nil nil nil (rem 1)
+  ".language_selector" ? do
+    color kWhite
+    backgroundColor transparent
+    borderStyle none
+    fontFamily ["futura-pt", "a-otf-ud-shin-go-pr6n"] [sansSerif]
+  ".language_selector" |> option ? do
+    backgroundColor kDark
+    fontFamily ["futura-pt", "a-otf-ud-shin-go-pr6n"] [sansSerif]
 
 index :: LBS.ByteString
 index =  renderBS $

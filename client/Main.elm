@@ -171,7 +171,13 @@ navigation model =
 setting : Model -> Html Msg
 setting model =
     ul [ class "setting" ]
-    [ li [][ div [] [ text "language: 日本語" ] ]
+    [ li [][ div []
+                 [ text "language: "
+                 , select [ class "language_selector" ]
+                     [ option [ value "jpn", selected (model.language == Japanese) ] [ text "日本語" ]
+                     , option [ value "eng", selected (model.language == English) ] [ text "English" ]
+                     ]
+                 ] ]
     , li [][ div [] [ text "seed: 98765167" ] ]
     ]
 
