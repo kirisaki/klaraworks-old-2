@@ -47,6 +47,7 @@ style = LTE.encodeUtf8 . renderWith compact [] $ do
   styleSetting
   styleRouting
   styleIndex
+  styleAbout
 
 styleNav :: Css
 styleNav = do
@@ -90,7 +91,8 @@ styleRouting = do
       height (vh 100 @-@ rem 2)
       top (rem 3.7)
       position relative
-  ".container.index" ?
+  ".container.index" ? do
+    overflow scroll
     left (vw 0)
   ".container.about" ?
     left (vw (-100))
@@ -98,6 +100,11 @@ styleRouting = do
     left (vw (-200))
   ".container.contact" ?
     left (vw (-300))
+  ".container" |> C.div |> article ? do
+    position relative
+    left (vw 5)
+    right (vw 5)
+    width (vw 90)
 
 styleSetting :: Css
 styleSetting = do
@@ -137,6 +144,11 @@ styleIndex = do
     display block
   ".container" |> ".index" |> h1 |> span ?
     display none
+
+styleAbout :: Css
+styleAbout =
+  ".about" |> article |> section |> h1 ?
+    fontWeight (weight 400)
 
 index :: LBS.ByteString
 index =  renderBS $

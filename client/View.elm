@@ -67,9 +67,40 @@ index model = div [ class "index" ]
               [ h1 [] [ span [] [ text "Klara Works" ]  ] ]
 
 about : Model -> Html Msg
-about model = div []
-              [ text "about"
+about model = div [ class "about" ] [
+                article []
+                    [ introduction model.language
+                    , introduction model.language
+                    , introduction model.language
+                    , introduction model.language
+                    , introduction model.language
+                    , introduction model.language
+                    ]
               ]
+
+card : String -> Html Msg -> Html Msg
+card title content = section [ class "card" ]
+                     [ h1 []  [ text title ]
+                     , div [] [ content ]
+                     ]
+
+introduction : Language -> Html Msg
+introduction l =
+    card "Introduction" <| text <|
+        case l of
+            Japanese -> """
+                         サークル「Klara Works（クラーラ･ワークス）」 は霧咲空人（きりさきあきひと）の運営する個人の同人サークルです。
+                         主にイラスト・漫画の制作を行い同人誌として即売会で頒布したり、ウェブ上で作品を発表しています。
+                         このサイトではイベントの参加情報や外部サービスへのリンク、同人誌情報の掲載などを行っています。
+                         """
+            English -> """
+                        Circle "Klara Works" is a doujin circle run by Akihito KIRISAKI.
+                        I mainly produce illustrations, mangas, distribute it as an doujinshi in doujin events,
+                        and present works on the web.
+                        This site provides participation information of the doujin event,
+                        links to external web services, publication of doujinshi information etc. are carried out.
+                        """
+               
 
 works : Model -> Html Msg
 works model = div []
