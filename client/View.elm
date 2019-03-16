@@ -50,15 +50,15 @@ setting : Model -> Html Msg
 setting model =
     ul [ class "setting" ]
     [ li [][ div []
-                 [ text "language: "
-                 , select [ class "language_selector",  on "change" Codec.languageDecoder ]
+                 [ label [ for "language" ] [ text "language: " ]
+                 , select [ class "language_selector", id "language",  on "change" Codec.languageDecoder ]
                      [ option [ value "jpn", selected (model.language == Japanese) ] [ text "日本語" ]
                      , option [ value "eng", selected (model.language == English) ] [ text "English" ]
                      ]
                  ] ]
     , li [][ div []
-                 [ text "seed: "
-                 , input [ class "seed", type_ "text", size 11, maxlength 11, value <| String.fromInt model.seed ][]
+                 [ label [ for "seed" ] [ text "seed: " ]
+                 , input [ class "seed", id "seed", type_ "text", size 11, maxlength 11, value <| String.fromInt model.seed ][]
                  ] ]
     ]
 
