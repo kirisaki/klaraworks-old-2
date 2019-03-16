@@ -6,6 +6,7 @@ module KlaraWorks.Style
 
 import           Clay                    hiding (div, style)
 import qualified Clay                    as C (div)
+import qualified Clay.Flexbox            as CF
 import qualified Clay.Media              as CM
 import qualified Data.ByteString.Lazy    as LBS
 import qualified Data.Text               as ST
@@ -106,10 +107,11 @@ styleRouting = do
   ".container.contact" ?
     left (vw (-300))
   ".container" |> C.div |> article ? do
-    position relative
-    left (vw 5)
-    right (vw 5)
-    width (vw 90)
+    position absolute
+    right nil
+    width (vw 70)
+    query CM.screen [CM.maxAspectRatio (1, 1)] $
+      width (vw 100)
 
 styleSetting :: Css
 styleSetting = do
@@ -152,17 +154,27 @@ styleIndex = do
 
 styleAbout :: Css
 styleAbout = do
-  ".about" |> article |> section ? do
-    marginTop (rem 0.7)
-    marginBottom (rem 0.7)
+  ".about" |> article  ? do
+    display flex
+    flexWrap CF.wrap
+    justifyContent CF.flexEnd
+  ".about" |> article |> C.div ? do
+    width (pct 50)
+    boxSizing borderBox
+    padding (rem 0.7) (rem 0.7) (rem 0.7) (rem 0.7)
+  ".about" |> article |> C.div |> section ? do
     padding (rem 1) (rem 1) (rem 1) (rem 1)
     borderWidth (px 1)
     borderStyle solid
-  ".about" |> article |> section |> h1 ? do
+    query CM.screen [CM.maxAspectRatio (1, 1)] $
+      width (pct 100)
+  ".about" |> article |> C.div |> section |> h1 ? do
     fontWeight (weight 400)
     fontSize kLarge
     borderWidth4 nil nil (px 1) nil
     borderStyle solid
+  ".about" |> article |> C.div |> section |> p ?
+    textAlign justify
 
 index :: LBS.ByteString
 index =  renderBS $
@@ -191,7 +203,7 @@ index =  renderBS $
         display flex
         position absolute
         kEase
-      (body <> h1 <> nav <> C.div <> ul) ? do
+      (body <> h1 <> nav <> C.div <> ul <> C.div) ? do
         margin nil nil nil nil
         padding nil nil nil nil
     link_  [rel_ "stylesheet", href_ "/style.css"]
