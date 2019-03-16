@@ -39,10 +39,14 @@ navigation : Model -> Html Msg
 navigation model =
     nav []
     [ ul []
-      [ a [ href "/" ] [ li [] [ text "index" ] ]
-      , a [ href "/about" ] [ li [] [ text "about" ] ]
-      , a [ href "/works" ] [ li [] [ text "works" ] ]
-      , a [ href "/contact" ] [ li [] [ text "contact" ] ]
+      [ a [ href "/", classList [ ( "active", model.route == Index ) ] ] [ li [] [ text "index" ] ]
+      , a [ href "/about", classList [ ( "active", model.route == About ) ] ] [ li [] [ text "about" ] ]
+      , a [ href "/works", classList [ ( "active"
+                                       , case model.route of
+                                             Works _ -> True
+                                             _ -> False)
+                                     ] ] [ li [] [ text "works" ] ]
+      , a [ href "/contact", classList [ ( "active", model.route == Contact ) ] ] [ li [] [ text "contact" ] ]
       ]
     ]
 

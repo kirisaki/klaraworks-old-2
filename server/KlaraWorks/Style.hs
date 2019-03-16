@@ -77,6 +77,11 @@ styleNav = do
     outlineStyle none
     textDecoration none
     transform $ skewX (deg 135)
+    kEase
+  nav |> ul |> "a.active" ?
+    backgroundColor kPink
+  nav |> ul |> a # hover ?
+    backgroundColor kPink
   nav |> ul |> a |> li ? do
     position relative
     left (rem (- 0.3))
