@@ -40,6 +40,9 @@ kMiddle = rem 1
 kLarge :: Size LengthUnit
 kLarge = rem 1.4
 
+kMobile :: Css -> Css
+kMobile = query CM.screen [CM.maxWidth (px 700)]
+
 style :: LBS.ByteString
 style = LTE.encodeUtf8 . renderWith compact [] $ do
   a ?
@@ -58,7 +61,7 @@ styleNav = do
     height (rem 2)
     top (rem 1.7)
     right (vw 2)
-    query CM.screen [CM.maxAspectRatio (1, 1)] $ do
+    kMobile $ do
       left (vw (-5))
       width (vw 110)
   nav |> ul ? do
@@ -94,7 +97,7 @@ styleRouting = do
   ".container" |>
     C.div ? do
       width (vw 100)
-      height (vh 100 @-@ rem 2)
+      height (pct 100 @-@ rem 3.7)
       top (rem 3.7)
       position relative
       overflow auto
@@ -110,7 +113,7 @@ styleRouting = do
     position absolute
     right nil
     width (vw 70)
-    query CM.screen [CM.maxAspectRatio (1, 1)] $
+    kMobile $
       width (vw 100)
 
 styleSetting :: Css
@@ -162,12 +165,12 @@ styleAbout = do
     width (pct 50)
     boxSizing borderBox
     padding (rem 0.7) (rem 0.7) (rem 0.7) (rem 0.7)
+    kMobile $
+      width (pct 100)
   ".about" |> article |> C.div |> section ? do
     padding (rem 1) (rem 1) (rem 1) (rem 1)
     borderWidth (px 1)
     borderStyle solid
-    query CM.screen [CM.maxAspectRatio (1, 1)] $
-      width (pct 100)
   ".about" |> article |> C.div |> section |> h1 ? do
     fontWeight (weight 400)
     fontSize kLarge
