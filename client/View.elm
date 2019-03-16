@@ -81,7 +81,7 @@ about model = div [ class "about" ] [
 card : String -> Html Msg -> Html Msg
 card title content = section [ class "card" ]
                      [ h1 []  [ text title ]
-                     , div [] [ content ]
+                     , p [] [ content ]
                      ]
 
 introduction : Language -> Html Msg

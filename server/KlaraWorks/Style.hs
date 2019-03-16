@@ -91,8 +91,8 @@ styleRouting = do
       height (vh 100 @-@ rem 2)
       top (rem 3.7)
       position relative
-  ".container.index" ? do
-    overflow scroll
+      overflow auto
+  ".container.index" ?
     left (vw 0)
   ".container.about" ?
     left (vw (-100))
@@ -146,9 +146,18 @@ styleIndex = do
     display none
 
 styleAbout :: Css
-styleAbout =
-  ".about" |> article |> section |> h1 ?
+styleAbout = do
+  ".about" |> article |> section ? do
+    marginTop (rem 0.7)
+    marginBottom (rem 0.7)
+    padding (rem 1) (rem 1) (rem 1) (rem 1)
+    borderWidth (px 1)
+    borderStyle solid
+  ".about" |> article |> section |> h1 ? do
     fontWeight (weight 400)
+    fontSize kLarge
+    borderWidth4 nil nil (px 1) nil
+    borderStyle solid
 
 index :: LBS.ByteString
 index =  renderBS $
@@ -161,6 +170,7 @@ index =  renderBS $
       body ? do
         backgroundColor kDark
         backgroundImage $ url "back.svg"
+        borderColor kWhite
         color kWhite
         overflow hidden
         position fixed
