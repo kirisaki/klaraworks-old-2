@@ -107,9 +107,15 @@ introduction l =
                
 
 works : Model -> Html Msg
-works model = div []
-              [ text "works"
-              ]
+works model = div [] 
+              (case model.worksList of
+                  Just l ->
+                      List.map (\r ->
+                          div [] [ text r.title ]
+                              ) l
+                  Nothing ->
+                      [ text "nyaan..." ]
+              )
 
 contact : Model -> Html Msg
 contact model = div []

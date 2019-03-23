@@ -138,7 +138,9 @@ update msg model =
                     , Cmd.none
                     )
         LanguageChanged l ->
-            ( { model | language = l }, Cmd.none )
+            ( { model | language = l }
+            , Task.attempt ReceiveWorksList (Fetch.worksList l)
+            )
 
         NavPrev ->
             let
