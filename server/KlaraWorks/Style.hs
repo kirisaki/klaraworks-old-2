@@ -133,10 +133,10 @@ styleSetting = do
     color kWhite
     backgroundColor transparent
     borderStyle none
-    fontFamily ["futura-pt", "a-otf-ud-shin-go-pr6n"] [sansSerif]
+    fontFamily ["Josefin Sans", "M PLUS 1p"] [sansSerif]
   ".language_selector" |> option ? do
     backgroundColor kDark
-    fontFamily ["futura-pt", "a-otf-ud-shin-go-pr6n"] [sansSerif]
+    fontFamily ["Josefin Sans", "M PLUS 1p"] [sansSerif]
   ".seed" ?
     textAlign end
 
@@ -198,7 +198,7 @@ index =  renderBS $
         bottom nil
         left nil
         right nil
-        fontFamily ["futura-pt", "a-otf-ud-shin-go-pr6n"] [sansSerif]
+        fontFamily ["Josefin Sans", "M PLUS 1p"] [sansSerif]
         fontSize (pt 11)
       ".container" ? do
         width (vw 400)
@@ -210,7 +210,8 @@ index =  renderBS $
         margin nil nil nil nil
         padding nil nil nil nil
     link_  [rel_ "stylesheet", href_ "/style.css"]
-    script_ "(function(d){var config={kitId:'lve6akb',scriptTimeout: 3000,async: true}, h=d.documentElement,t=setTimeout(function(){h.className=h.className.replace(/\bwf-loading\b/g,'')+' wf-inactive';},config.scriptTimeout),tk=d.createElement('script'),f=false,s=d.getElementsByTagName('script')[0],a;h.className+=' wf-loading';tk.src='https://use.typekit.net/'+config.kitId+'.js';tk.async=true;tk.onload=tk.onreadystatechange=function(){a=this.readyState;if(f||a&&a!='complete'&&a!='loaded')return;f=true;clearTimeout(t);try{Typekit.load(config)}catch(e){}};s.parentNode.insertBefore(tk,s)})(document);"
+    link_  [rel_ "stylesheet", href_ "https://fonts.googleapis.com/css?family=Josefin+Sans"]
+    link_  [rel_ "stylesheet", href_ "https://fonts.googleapis.com/css?family=M+PLUS+1p"]
   body_ $ do
     div_ [id_ "main"] ""
     script_ [async_ "", src_ "/main.js"] ST.empty
