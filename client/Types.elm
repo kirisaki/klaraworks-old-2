@@ -39,6 +39,8 @@ type Msg
     | ReceiveWorkDetail (Result Http.Error WorkDetail)
     | LanguageChanged Language
     | Trace String
+    | NavPrev
+    | NavNext
     | NoOp
 
 type alias Model =

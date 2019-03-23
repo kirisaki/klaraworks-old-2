@@ -11,6 +11,8 @@ import Url exposing(Url)
 import Url.Parser as UP exposing((</>),Parser)
 import Task
 import Dict exposing (Dict)
+import Json.Decode as JD
+import Browser.Events
 
 main =
     Browser.application
@@ -72,6 +74,22 @@ router url =
             Just r -> r
             _ -> NotFound
 
+toUrl : Route -> String
+toUrl r =
+    case r of
+        Index ->
+            "/"
+        About ->
+            "/about"
+        Works Nothing ->
+            "/works"
+        Works (Just x) ->
+            "/works/" ++ x
+        Contact ->
+            "/contact"
+        NotFound ->
+            "/404"
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
@@ -122,16 +140,76 @@ update msg model =
         LanguageChanged l ->
             ( { model | language = l }, Cmd.none )
 
-        Trace str ->
-            ( Debug.log str model, Cmd.none )
+        NavPrev ->
+            let
+                newRoute =
+                    case model.route of
+                        Index ->
+                            Index
+                        About ->
+                            Index
+                        Works Nothing ->
+                            About
+                        Works (Just x) ->
+                            Works (Just x)
+                        Contact ->
+                            Works Nothing
+                        NotFound->
+                            Index
+                newUrl = toUrl newRoute
+            in
+                ( { model | route = newRoute }
+                , Nav.pushUrl model.key newUrl
+                )
+        NavNext ->
+            let
+                newRoute =
+                    case model.route of
+                        Index ->
+                            About
+                        About ->
+                            Works Nothing
+                        Works Nothing ->
+                            Contact
+                        Works (Just x) ->
+                            Works (Just x)
+                        Contact ->
+                            Contact
+                        NotFound->
+                            Index
+                newUrl = toUrl newRoute
+            in
+                ( { model | route = newRoute }
+                , Nav.pushUrl model.key newUrl
+                )
         NoOp ->
             ( model
             , Cmd.none
             )
+        Trace str ->
+            ( Debug.log str model, Cmd.none )
+
+
+keyHandler : Sub Msg
+keyHandler =
+    let
+        toMsg str =
+            case str of
+                "ArrowLeft" -> NavPrev
+                "ArrowRight" -> NavNext
+                "h" -> NavPrev
+                "l" -> NavNext
+                _ -> NoOp
+
+        decoder =
+            JD.map toMsg (JD.field "key" JD.string)
+    in
+    Browser.Events.onKeyDown decoder
 
 
 subscriptions : Model -> Sub Msg
-subscriptions model =
-    Sub.none
+subscriptions _ =
+    keyHandler
+
 
 
