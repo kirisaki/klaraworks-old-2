@@ -7,6 +7,7 @@ import Browser exposing (Document)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
+import Html.Lazy exposing (lazy)
 import String
 import Json.Decode as JD
 
@@ -25,13 +26,13 @@ view model =
                         , True )
                       ]
                 ]
-                [ index model
-                , about model
-                , works model
-                , contact model
+                [ lazy index model
+                , lazy about model
+                , lazy works model
+                , lazy contact model
                 ]
-          , navigation model
-          , setting model
+          , lazy navigation model
+          , lazy setting model
           ]
     }
 

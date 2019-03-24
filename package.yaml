@@ -10,6 +10,10 @@ extra-source-files:
 - README.md
 - ChangeLog.md
 - client/Main.elm
+- client/View.elm
+- client/Types.elm
+- client/Codec.elm
+- client/Fetch.elm
 
 synopsis:            My website server
 category:            Web
