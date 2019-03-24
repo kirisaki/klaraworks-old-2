@@ -48,11 +48,16 @@ style :: LBS.ByteString
 style = LTE.encodeUtf8 . renderWith compact [] $ do
   a ?
     color kWhite
+  article  ? do
+    display flex
+    flexWrap CF.wrap
+    justifyContent CF.flexEnd
   styleNav
   styleSetting
   styleRouting
   styleIndex
   styleAbout
+  styleWorks
 
 styleNav :: Css
 styleNav = do
@@ -95,13 +100,12 @@ styleNav = do
 
 styleRouting :: Css
 styleRouting = do
-  ".container" |>
-    C.div ? do
-      width (vw 100)
-      height (pct 100 @-@ rem 3.7)
-      top (rem 3.7)
-      position relative
-      overflow auto
+  ".container" |> C.div ? do
+    width (vw 100)
+    height (pct 100 @-@ rem 3.7)
+    top (rem 3.7)
+    position relative
+    overflow auto
   ".container.index" ?
     left (vw 0)
   ".container.about" ?
@@ -158,10 +162,6 @@ styleIndex = do
 
 styleAbout :: Css
 styleAbout = do
-  ".about" |> article  ? do
-    display flex
-    flexWrap CF.wrap
-    justifyContent CF.flexEnd
   ".about" |> article |> C.div ? do
     width (pct 50)
     boxSizing borderBox
@@ -179,6 +179,20 @@ styleAbout = do
     borderStyle solid
   ".about" |> article |> C.div |> section |> p ?
     textAlign justify
+
+styleWorks :: Css
+styleWorks = do
+  ".works" |> article |> C.div ? do
+    width (pct 25)
+    boxSizing borderBox
+    padding (rem 0.7) (rem 0.7) (rem 0.7) (rem 0.7)
+    kMobile $
+      width (pct 50)
+  ".works" |> article |> C.div |> section ? do
+    padding (rem 1) (rem 1) (rem 1) (rem 1)
+    borderWidth (px 1)
+    borderStyle solid
+    
 
 index :: LBS.ByteString
 index =  renderBS $
@@ -200,25 +214,23 @@ index =  renderBS $
         left nil
         right nil
         fontFamily ["Josefin Sans", "M PLUS 1p"] [sansSerif]
-        fontSize (pt 11)
+        fontSize (pt 12)
       ".container" ? do
         width (vw 400)
         height (vh 100)
         display flex
         position absolute
         kEase
-      (body <> h1 <> nav <> C.div <> ul <> C.div) ? do
+      (body <> h1 <> nav <> C.div <> ul) ? do
         margin nil nil nil nil
         padding nil nil nil nil
     link_  [rel_ "dns-prefetch", href_ "https://fonts.gstatic.com/"]
-    link_  [rel_ "stylesheet", href_ "/style.css"]
     link_  [rel_ "preload", href_ "/klaraworks.svg", Attribute "as" "image"]
     link_  [rel_ "preload", href_ "/back.svg", Attribute "as" "image"]
     link_  [rel_ "preload", href_ "/main.js", Attribute "as" "script"]
-    link_  [rel_ "preload", href_ "/JosefinSans.css", Attribute "as" "style"]
-    link_  [rel_ "preload", href_ "/MPLUS1p.css", Attribute "as" "style"]
     link_  [rel_ "stylesheet", href_ "/JosefinSans.css"]
     link_  [rel_ "stylesheet", href_ "/MPLUS1p.css"]
+    link_  [rel_ "stylesheet", href_ "/style.css"]
   body_ $ do
     div_ [id_ "main"] ""
     script_ [async_ "", src_ "/main.js"] ST.empty
