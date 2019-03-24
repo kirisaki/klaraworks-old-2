@@ -159,9 +159,23 @@ update msg model =
                         NotFound->
                             Index
                 newUrl = toUrl newRoute
+                newCmd =
+                    case newRoute of
+                        Works Nothing ->
+                            Cmd.batch
+                                [ Task.attempt ReceiveWorksList (Fetch.worksList model.language)
+                                , Nav.pushUrl model.key newUrl
+                                ]
+                        Works (Just i) ->
+                            Cmd.batch
+                                [ Task.attempt ReceiveWorkDetail (Fetch.workDetail i model.language)
+                                , Nav.pushUrl model.key newUrl
+                                ]
+                        _ ->
+                                Nav.pushUrl model.key newUrl
             in
                 ( { model | route = newRoute }
-                , Nav.pushUrl model.key newUrl
+                , newCmd
                 )
         NavNext ->
             let
@@ -180,9 +194,23 @@ update msg model =
                         NotFound->
                             Index
                 newUrl = toUrl newRoute
+                newCmd =
+                    case newRoute of
+                        Works Nothing ->
+                            Cmd.batch
+                                [ Task.attempt ReceiveWorksList (Fetch.worksList model.language)
+                                , Nav.pushUrl model.key newUrl
+                                ]
+                        Works (Just i) ->
+                            Cmd.batch
+                                [ Task.attempt ReceiveWorkDetail (Fetch.workDetail i model.language)
+                                , Nav.pushUrl model.key newUrl
+                                ]
+                        _ ->
+                                Nav.pushUrl model.key newUrl
             in
                 ( { model | route = newRoute }
-                , Nav.pushUrl model.key newUrl
+                , newCmd
                 )
         NoOp ->
             ( model

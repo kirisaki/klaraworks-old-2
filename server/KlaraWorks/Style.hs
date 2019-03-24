@@ -12,6 +12,7 @@ import qualified Data.ByteString.Lazy    as LBS
 import qualified Data.Text               as ST
 import qualified Data.Text.Lazy.Encoding as LTE
 import           Lucid
+import           Lucid.Base
 import           Prelude                 hiding (rem, span)
 
 rgb' :: Integer -> Color
@@ -211,6 +212,11 @@ index =  renderBS $
         padding nil nil nil nil
     link_  [rel_ "dns-prefetch", href_ "https://fonts.gstatic.com/"]
     link_  [rel_ "stylesheet", href_ "/style.css"]
+    link_  [rel_ "preload", href_ "/klaraworks.svg", Attribute "as" "image"]
+    link_  [rel_ "preload", href_ "/back.svg", Attribute "as" "image"]
+    link_  [rel_ "preload", href_ "/main.js", Attribute "as" "script"]
+    link_  [rel_ "preload", href_ "/JosefinSans.css", Attribute "as" "style"]
+    link_  [rel_ "preload", href_ "/MPLUS1p.css", Attribute "as" "style"]
     link_  [rel_ "stylesheet", href_ "/JosefinSans.css"]
     link_  [rel_ "stylesheet", href_ "/MPLUS1p.css"]
   body_ $ do
