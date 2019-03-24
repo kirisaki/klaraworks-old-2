@@ -209,9 +209,10 @@ index =  renderBS $
       (body <> h1 <> nav <> C.div <> ul <> C.div) ? do
         margin nil nil nil nil
         padding nil nil nil nil
+    link_  [rel_ "dns-prefetch", href_ "https://fonts.gstatic.com/"]
     link_  [rel_ "stylesheet", href_ "/style.css"]
-    link_  [rel_ "stylesheet", href_ "https://fonts.googleapis.com/css?family=Josefin+Sans"]
-    link_  [rel_ "stylesheet", href_ "https://fonts.googleapis.com/css?family=M+PLUS+1p"]
+    link_  [rel_ "stylesheet", href_ "/JosefinSans.css"]
+    link_  [rel_ "stylesheet", href_ "/MPLUS1p.css"]
   body_ $ do
     div_ [id_ "main"] ""
     script_ [async_ "", src_ "/main.js"] ST.empty

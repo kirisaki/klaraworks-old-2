@@ -43,6 +43,14 @@ server Assets{..} req respond' =
         respond
         [("Content-Type", "image/svg+xml")]
         klaraworksSvg
+      ["JosefinSans.css"] ->
+        respond
+        [("Content-Type", "text/css")]
+        josefinSansCss
+      ["MPLUS1p.css"] ->
+        respond
+        [("Content-Type", "text/css")]
+        mPlus1pCss
       ["api", "works", x] -> do
         liftIO $ print $ rawQueryString req
         case (x, rawQueryString req) of
@@ -121,6 +129,8 @@ data Assets = Assets
   , styleCss      :: LBS.ByteString
   , backSvg       :: LBS.ByteString
   , klaraworksSvg :: LBS.ByteString
+  , josefinSansCss :: LBS.ByteString
+  , mPlus1pCss :: LBS.ByteString
   }
 
 boot :: IO ()
@@ -135,6 +145,8 @@ boot = do
     , styleCss =  style
     , backSvg = LBS.fromStrict $(embedFile "assets/back.svg")
     , klaraworksSvg = LBS.fromStrict $(embedFile "assets/klaraworks.svg")
+    , josefinSansCss = LBS.fromStrict $(embedFile "assets/Josefin+Sans.css")
+    , mPlus1pCss = LBS.fromStrict $(embedFile "assets/M+PLUS+1p.css")
     }
 
 
