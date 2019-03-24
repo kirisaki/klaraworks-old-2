@@ -1,6 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards   #-}
 {-# LANGUAGE TemplateHaskell   #-}
+{-# LANGUAGE LambdaCase #-}
 module Main (main, boot) where
 
 import           KlaraWorks.Style
@@ -16,6 +17,7 @@ import           Network.HTTP.Types
 import           Network.Wai
 import           Network.Wai.Handler.Warp
 import           Network.Wai.Handler.WarpTLS
+import Data.Int
 
 import           Clay                        hiding (style)
 
@@ -122,6 +124,29 @@ server Assets{..} req respond' =
         [("Content-Type", "text/html")]
         indexHtml
 
+data Language
+  = Japanese
+  | English
+
+languagetoCode :: Language -> LBS.ByteString
+languagetoCode = \case
+  Japanese -> "jpn"
+  English -> "eng"
+
+data WorkMeta = WorkMeta
+  { title :: ST.Text
+  , origin :: Maybe ST.Text
+  , contents :: [ST.Text]
+  }
+
+data Work = Work
+  { workId :: ST.Text
+  , timestanp :: Int32
+  , meta :: [(Language, WorkMeta)]
+  }
+
+encodeWorkDetail :: Work -> LBS.ByteString
+encodeWorkDetail work = undefined
 
 data Assets = Assets
   { indexHtml     :: LBS.ByteString

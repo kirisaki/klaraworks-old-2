@@ -183,7 +183,7 @@ styleAbout = do
 styleWorks :: Css
 styleWorks = do
   ".works" |> article |> C.div ? do
-    width (pct 25)
+    width (pct 33)
     boxSizing borderBox
     padding (rem 0.7) (rem 0.7) (rem 0.7) (rem 0.7)
     kMobile $
