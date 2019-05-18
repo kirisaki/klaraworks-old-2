@@ -10,10 +10,12 @@ import           Paths_klaraworks
 
 import           Control.Monad.IO.Class      (liftIO)
 import           Data.Binary.Builder
+import qualified Data.ByteString             as SBS
 import qualified Data.ByteString.Lazy        as LBS
 import           Data.FileEmbed              (embedFile)
 import           Data.Int
 import qualified Data.List                   as L
+import           Data.Maybe
 import qualified Data.Text                   as ST
 import qualified Data.Text.Encoding          as STE
 import qualified Data.Text.Lazy.Encoding     as LTE
@@ -62,23 +64,60 @@ server Assets{..} req respond' =
           "?jpn" ->
             respond
             [("Content-Type", "application/vnd.klaraworks.works")]
-            ( "\x22" <> "\x00\x02" <>
-              "\x0e" <> "20190301-lady2" <> "\x5c\x53\x0d\x6e" <> "\x00\x0c" <> "\227\129\172\227\129\132\227\129\172\227\129\132" <>
-              "\x0e" <> "20190401-lady3" <> "\x5c\x53\x0d\x6e" <> "\x00\x06" <> "\229\176\145\229\165\179" <>
-              ""
-            )
+            $ encodeWorksSummary sampleWorks Japanese
           "?eng" ->
             respond
             [("Content-Type", "application/vnd.klaraworks.works")]
-            ( "\x22" <> "\x00\x02" <>
-              "\x0e" <> "20190301-lady2" <> "\x5c\x53\x0d\x6e" <> "\x00\x06" <> "Nuinui" <>
-              "\x0e" <> "20190401-lady3" <> "\x5c\x53\x0d\x6e" <> "\x00\x06" <> "A Girl" <>
-              ""
-            )
+            $ encodeWorksSummary sampleWorks English
       _ ->
         respond
         [("Content-Type", "text/html")]
         indexHtml
+
+sampleWorks :: [Work]
+sampleWorks =
+  [ Work
+    "20190301-lady"
+    0x5c530d6e
+    Picture
+    [ (Japanese, WorkMeta "少女" "")
+    , (English, WorkMeta "A Girl" "")
+    ]
+  , Work
+    "20190301-nuinui"
+    0x5c530d6e
+    Picture
+    [ (Japanese, WorkMeta "ぬいぬい" "艦隊これくしょん")
+    , (English, WorkMeta "Nuinui" "Kantai Collection")
+    ]
+  ]
+
+encodeWorksSummary :: [Work] -> Language -> LBS.ByteString
+encodeWorksSummary works lang =
+  let
+    summaries = fmap
+             (\w ->
+                case L.lookup lang (workMeta w) of
+                  Nothing -> Nothing
+                  Just m ->
+                    let
+                      lenId = singleton . length8 $ workId w
+                      lenTitle = putWord16be . length16 $ workMetaTitle m
+                    in
+                      Just $
+                      lenId <> (fromByteString . STE.encodeUtf8) (workId w) <>
+                      putInt32be (workTimestamp w) <>
+                      lenTitle <> (fromByteString . STE.encodeUtf8) (workMetaTitle m)
+             ) works
+  in
+    case catMaybes summaries of
+      [] -> "\x44"
+      ss ->
+        let
+          num = putWord16be . fromIntegral $ L.length ss
+        in
+          toLazyByteString $
+          "\x22" <> num <> mconcat ss
 
 encodeWorkDetail :: Work -> Language -> LBS.ByteString
 encodeWorkDetail work lang =
@@ -117,8 +156,6 @@ workTypeToCode = \case
   Picture -> "\x01"
   Manga -> "\x02"
 
-
-
 data WorkMeta = WorkMeta
   { workMetaTitle  :: ST.Text
   , workMetaOrigin :: ST.Text
@@ -132,10 +169,10 @@ data Work = Work
   }
 
 length8 :: ST.Text -> Word8
-length8 = fromIntegral . ST.length
+length8 = fromIntegral . SBS.length . STE.encodeUtf8
 
 length16 :: ST.Text -> Word16
-length16 = fromIntegral . ST.length
+length16 = fromIntegral . SBS.length . STE.encodeUtf8
 
 
 data Assets = Assets
