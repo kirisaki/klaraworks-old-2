@@ -1,7 +1,7 @@
+{-# LANGUAGE LambdaCase        #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards   #-}
 {-# LANGUAGE TemplateHaskell   #-}
-{-# LANGUAGE LambdaCase #-}
 module Main (main, boot) where
 
 import           KlaraWorks.Style
@@ -9,15 +9,18 @@ import           KlaraWorks.TH
 import           Paths_klaraworks
 
 import           Control.Monad.IO.Class      (liftIO)
+import           Data.Binary
 import qualified Data.ByteString.Lazy        as LBS
 import           Data.FileEmbed              (embedFile)
+import           Data.Int
+import qualified Data.List                   as L
 import qualified Data.Text                   as ST
 import qualified Data.Text.Lazy.Encoding     as LTE
+import           Data.Word
 import           Network.HTTP.Types
 import           Network.Wai
 import           Network.Wai.Handler.Warp
 import           Network.Wai.Handler.WarpTLS
-import Data.Int
 
 import           Clay                        hiding (style)
 
@@ -127,35 +130,63 @@ server Assets{..} req respond' =
 data Language
   = Japanese
   | English
+  deriving(Show, Eq)
 
-languagetoCode :: Language -> LBS.ByteString
-languagetoCode = \case
+languageToCode :: Language -> LBS.ByteString
+languageToCode = \case
   Japanese -> "jpn"
   English -> "eng"
 
+data WorkType
+  = Picture
+  | Manga
+  deriving(Show, Eq)
+
+workTypeToCode :: WorkType -> LBS.ByteString
+workTypeToCode = \case
+  Picture -> "\x01"
+  Manga -> "\x02"
+
+
+
 data WorkMeta = WorkMeta
-  { title :: ST.Text
-  , origin :: Maybe ST.Text
-  , contents :: [ST.Text]
+  { workMetaTitle  :: ST.Text
+  , workMetaOrigin :: ST.Text
   }
 
 data Work = Work
-  { workId :: ST.Text
-  , timestanp :: Int32
-  , meta :: [(Language, WorkMeta)]
+  { workId        :: ST.Text
+  , workTimestanp :: Int32
+  , workType      :: WorkType
+  , workMeta      :: [(Language, WorkMeta)]
   }
 
-encodeWorkDetail :: Work -> LBS.ByteString
-encodeWorkDetail work = undefined
+length8 :: ST.Text -> Word8
+length8 = fromIntegral . ST.length
+
+length16 :: ST.Text -> Word16
+length16 = fromIntegral . ST.length
+
+encodeWorkDetail :: Work -> Language -> LBS.ByteString
+encodeWorkDetail work lang =
+  case L.lookup lang $ workMeta work of
+    Nothing -> "\x44"
+    Just m ->
+      let
+        lenId = length8 $ workId work
+        lenTitle = length16 $ workMetaTitle m
+        lenOrigin = length16 $ workMetaOrigin m
+      in
+        undefined
 
 data Assets = Assets
-  { indexHtml     :: LBS.ByteString
-  , mainJs        :: LBS.ByteString
-  , styleCss      :: LBS.ByteString
-  , backSvg       :: LBS.ByteString
-  , klaraworksSvg :: LBS.ByteString
+  { indexHtml      :: LBS.ByteString
+  , mainJs         :: LBS.ByteString
+  , styleCss       :: LBS.ByteString
+  , backSvg        :: LBS.ByteString
+  , klaraworksSvg  :: LBS.ByteString
   , josefinSansCss :: LBS.ByteString
-  , mPlus1pCss :: LBS.ByteString
+  , mPlus1pCss     :: LBS.ByteString
   }
 
 boot :: IO ()

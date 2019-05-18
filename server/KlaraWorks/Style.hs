@@ -168,10 +168,7 @@ styleAbout = do
     padding (rem 0.7) (rem 0.7) (rem 0.7) (rem 0.7)
     kMobile $
       width (pct 100)
-  ".about" |> article |> C.div |> section ? do
-    padding (rem 1) (rem 1) (rem 1) (rem 1)
-    borderWidth (px 1)
-    borderStyle solid
+  ".about" |> article |> C.div |> section ? box
   ".about" |> article |> C.div |> section |> h1 ? do
     fontWeight (weight 400)
     fontSize kLarge
@@ -188,11 +185,13 @@ styleWorks = do
     padding (rem 0.7) (rem 0.7) (rem 0.7) (rem 0.7)
     kMobile $
       width (pct 50)
-  ".works" |> article |> C.div |> section ? do
-    padding (rem 1) (rem 1) (rem 1) (rem 1)
-    borderWidth (px 1)
-    borderStyle solid
-    
+  ".works" |> article |> C.div |> section ? box
+
+box :: Css
+box = do
+  padding (rem 1) (rem 1) (rem 1) (rem 1)
+  borderWidth (px 1)
+  borderStyle solid
 
 index :: LBS.ByteString
 index =  renderBS $

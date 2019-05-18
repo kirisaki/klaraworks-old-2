@@ -24,6 +24,7 @@ dependencies:
 - base >= 4.7 && < 5
 - aeson
 - bytestring
+- binary
 - clay
 - directory
 - file-embed
