@@ -1,3 +1,4 @@
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE LambdaCase        #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards   #-}
@@ -8,7 +9,9 @@ import           KlaraWorks.Style
 import           KlaraWorks.TH
 import           Paths_klaraworks
 
-import           Control.Monad.IO.Class      (liftIO)
+import           Control.Monad.IO.Class      (liftIO, MonadIO)
+import Control.Lens
+import Control.Monad.Reader
 import           Data.Binary.Builder
 import qualified Data.ByteString             as SBS
 import qualified Data.ByteString.Lazy        as LBS
@@ -24,71 +27,29 @@ import           Network.HTTP.Types
 import           Network.Wai
 import           Network.Wai.Handler.Warp
 import           Network.Wai.Handler.WarpTLS
+import qualified Data.HashMap.Strict as HM
+import Data.Functor
+import Control.Exception.Safe
 
 import           Clay                        hiding (style)
 
 import           Lucid
 
-server :: Assets -> Application
-server Assets{..} req respond' =
-  let
-    respond t = respond' . responseLBS status200 t
-  in
-    case pathInfo req of
-      ["main.js"] ->
-        respond
-        [("Content-Type", "text/javascript")]
-        mainJs
-      ["style.css"] ->
-        respond
-        [("Content-Type", "text/css")]
-        styleCss
-      ["back.svg"] ->
-        respond
-        [("Content-Type", "image/svg+xml")]
-        backSvg
-      ["klaraworks.svg"] ->
-        respond
-        [("Content-Type", "image/svg+xml")]
-        klaraworksSvg
-      ["JosefinSans.css"] ->
-        respond
-        [("Content-Type", "text/css")]
-        josefinSansCss
-      ["MPLUS1p.css"] ->
-        respond
-        [("Content-Type", "text/css")]
-        mPlus1pCss
-      ["api", "works"] ->
-        case rawQueryString req of
-          "?jpn" ->
-            respond
-            [("Content-Type", "application/vnd.klaraworks.works")]
-            $ encodeWorksSummary sampleWorks Japanese
-          "?eng" ->
-            respond
-            [("Content-Type", "application/vnd.klaraworks.works")]
-            $ encodeWorksSummary sampleWorks English
-      _ ->
-        respond
-        [("Content-Type", "text/html")]
-        indexHtml
-
 sampleWorks :: [Work]
 sampleWorks =
   [ Work
-    "20190301-lady"
+    "20190515-yudachi"
     0x5c530d6e
     Picture
-    [ (Japanese, WorkMeta "少女" "")
-    , (English, WorkMeta "A Girl" "")
+    [ (Japanese, WorkMeta "お祈り夕立" "艦隊これくしょん")
+    , (English, WorkMeta "Yudachi praying" "Kantai Collection")
     ]
   , Work
-    "20190301-nuinui"
+    "20190406-lily"
     0x5c530d6e
     Picture
-    [ (Japanese, WorkMeta "ぬいぬい" "艦隊これくしょん")
-    , (English, WorkMeta "Nuinui" "Kantai Collection")
+    [ (Japanese, WorkMeta "百合の魔術師" "")
+    , (English, WorkMeta "The witch of lily" "")
     ]
   ]
 
@@ -174,32 +135,128 @@ length8 = fromIntegral . SBS.length . STE.encodeUtf8
 length16 :: ST.Text -> Word16
 length16 = fromIntegral . SBS.length . STE.encodeUtf8
 
+data ContentType
+  = Html
+  | JavaScript
+  | Css
+  | Svg
+  deriving (Show, Eq)
 
-data Assets = Assets
-  { indexHtml      :: LBS.ByteString
-  , mainJs         :: LBS.ByteString
-  , styleCss       :: LBS.ByteString
-  , backSvg        :: LBS.ByteString
-  , klaraworksSvg  :: LBS.ByteString
-  , josefinSansCss :: LBS.ByteString
-  , mPlus1pCss     :: LBS.ByteString
-  }
+typeToHeader :: ContentType -> Header
+typeToHeader =
+  let
+    h t = ("Content-Type", t)
+  in
+    \case
+      Html -> h "text/html"
+      JavaScript -> h "text/javascript"
+      Css -> h "text/css"
+      Svg -> h "image/svg+xml"
+
+data ContentData
+  = File FilePath
+  | Byte LBS.ByteString
+  deriving (Show, Eq)
+
+data Asset = Asset
+  { contentData :: ContentData
+  , contentType :: ContentType
+  } deriving (Show, Eq)
+
+makeLensesWith classyRules_ ''Asset
+
+data AssetsEnv = AssetsEnv
+  { files      :: HM.HashMap ST.Text Asset
+  , images       :: HM.HashMap String LBS.ByteString
+  } deriving(Show)
+
+makeClassy_ ''AssetsEnv
+
+data Env = Env
+  { assets :: AssetsEnv
+  } deriving(Show)
+
+makeLensesWith classyRules_ ''Env
+
+instance HasAssetsEnv Env where
+  assetsEnv = _assets
+
+
+server :: (HasAssetsEnv env) => KlaraWorks env
+server = do
+  fs <- view (assetsEnv . _files)
+  pure $
+    \req res ->
+      let
+        notFound = res $ responseLBS status404
+                   [typeToHeader Html]
+                   "not found"
+        index = case HM.lookup "index.html" fs of
+              Just (Asset (Byte b) t) ->
+                res $ responseLBS status200
+                [typeToHeader t]
+                b
+              _ ->
+                notFound
+      in
+        case pathInfo req of
+          [] -> index
+          ["about"] -> index
+          ["works"] -> index
+          ["contact"] -> index
+          [x] ->
+            case HM.lookup x fs of
+              Just (Asset (Byte b) t) ->
+                res $ responseLBS status200
+                [typeToHeader t]
+                b
+              Just (Asset (File f) t) ->
+                res $ responseFile status200
+                [typeToHeader t]
+                f Nothing
+              _ ->
+                notFound
+          ["api", "works"] ->
+            case rawQueryString req of
+              "?jpn" ->
+                res $ responseLBS status200
+                [("Content-Type", "application/vnd.klaraworks.works")]
+                $ encodeWorksSummary sampleWorks Japanese
+              "?eng" ->
+                res $ responseLBS status200
+                [("Content-Type", "application/vnd.klaraworks.works")]
+                $ encodeWorksSummary sampleWorks English
+          _ ->
+            notFound
 
 boot :: IO ()
 boot = do
   $(build)
   let s = setPort 8000 defaultSettings
   let t = tlsSettings "../ssl/localhost.crt" "../ssl/localhost.key"
-  runTLS t s . server $ Assets
-    { indexHtml = index
-    , mainJs = LTE.encodeUtf8 $(loadFile "dist/main.js") <>
-               "var app = Elm.Main.init();"
-    , styleCss =  style
-    , backSvg = LBS.fromStrict $(embedFile "assets/back.svg")
-    , klaraworksSvg = LBS.fromStrict $(embedFile "assets/klaraworks.svg")
-    , josefinSansCss = LBS.fromStrict $(embedFile "assets/Josefin+Sans.css")
-    , mPlus1pCss = LBS.fromStrict $(embedFile "assets/M+PLUS+1p.css")
-    }
+  runTLS t s =<< runReaderT server
+    (Env
+     (AssetsEnv
+      (HM.fromList
+       [ ("index.html", Asset (Byte KlaraWorks.Style.index) Html)
+       , ("main.js", Asset (Byte (LTE.encodeUtf8 $(loadFile "dist/main.js") <> "var app = Elm.Main.init();")) JavaScript)
+       , ("style.css", Asset (Byte style) Css)
+       , ("back.svg", Asset (File "./assets/back.svg") Svg)
+       , ("klaraworks.svg", Asset (File "./assets/klaraworks.svg") Svg)
+       , ("JosefinSans.css", Asset (File "./assets/Josefin+Sans.css") Css)
+       , ("MPLUS1p.css", Asset (File "./assets/M+PLUS+1p.css") Css)
+       ]
+      )
+      HM.empty
+     )
+    )
+
+type ApplicationM m = Request -> (Response -> m ResponseReceived) -> m ResponseReceived
+newtype KlaraT env m a = KlaraT { runK :: ReaderT env m a }
+  deriving (Functor, Applicative, Monad, MonadIO, MonadThrow, MonadCatch, MonadMask)
+
+type KlaraWorks env = ReaderT env IO Application
+
 
 
 main :: IO ()

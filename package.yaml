@@ -32,9 +32,12 @@ dependencies:
 - lens
 - lens-aeson
 - lucid
+- mtl
 - process
+- safe-exceptions
 - template-haskell
 - text
+- unordered-containers
 - vector
 - wai
 - warp
@@ -43,6 +46,26 @@ dependencies:
 
 # develop
 - foreign-store
+
+default-extensions:
+- DataKinds
+- ConstraintKinds
+- ExistentialQuantification
+- FlexibleContexts
+- FlexibleInstances
+- KindSignatures
+- LambdaCase
+- MultiParamTypeClasses
+- OverloadedLabels
+- OverloadedStrings
+- RankNTypes
+- RecordWildCards
+- PolyKinds
+- ScopedTypeVariables
+- TypeApplications
+- TypeFamilies
+- TypeOperators
+- TypeSynonymInstances
 
 executables:
   klaraworks:
