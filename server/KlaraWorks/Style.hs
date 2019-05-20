@@ -185,7 +185,10 @@ styleWorks = do
     padding (rem 0.7) (rem 0.7) (rem 0.7) (rem 0.7)
     kMobile $
       width (pct 50)
-  ".works" |> article |> C.div |> section ? box
+  ".works" |> article |> C.div |> section ? do
+    box
+    img ?
+      width (pct 100)
 
 box :: Css
 box = do

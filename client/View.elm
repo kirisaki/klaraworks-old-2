@@ -112,14 +112,15 @@ works model = div [ class "works" ]
               [ article []
                     (case model.worksList of
                          Just l ->
-                             List.map
-                                 (\r ->
-                                      div [] [section [] [ text r.title ]]
-                                 ) l
+                             List.map workSummary l
                          Nothing ->
                              [ text "nyaan..." ]
                     )
               ]
+workSummary : WorkSummary -> Html Msg
+workSummary s = div [] [section [] [ img [ src ("/" ++ s.id_ ++ "-0.jpg") ][] ,text s.title ]]
+
+
 contact : Model -> Html Msg
 contact model = div []
                 [ text "contact"

@@ -1,21 +1,24 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
-{-# LANGUAGE LambdaCase        #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE RecordWildCards   #-}
-{-# LANGUAGE TemplateHaskell   #-}
+{-# LANGUAGE LambdaCase                 #-}
+{-# LANGUAGE OverloadedStrings          #-}
+{-# LANGUAGE RecordWildCards            #-}
+{-# LANGUAGE TemplateHaskell            #-}
 module Main (main, boot) where
 
 import           KlaraWorks.Style
 import           KlaraWorks.TH
 import           Paths_klaraworks
 
-import           Control.Monad.IO.Class      (liftIO, MonadIO)
-import Control.Lens
-import Control.Monad.Reader
+import           Control.Exception.Safe
+import           Control.Lens
+import           Control.Monad.IO.Class      (MonadIO, liftIO)
+import           Control.Monad.Reader
 import           Data.Binary.Builder
 import qualified Data.ByteString             as SBS
 import qualified Data.ByteString.Lazy        as LBS
 import           Data.FileEmbed              (embedFile)
+import           Data.Functor
+import qualified Data.HashMap.Strict         as HM
 import           Data.Int
 import qualified Data.List                   as L
 import           Data.Maybe
@@ -27,31 +30,10 @@ import           Network.HTTP.Types
 import           Network.Wai
 import           Network.Wai.Handler.Warp
 import           Network.Wai.Handler.WarpTLS
-import qualified Data.HashMap.Strict as HM
-import Data.Functor
-import Control.Exception.Safe
 
 import           Clay                        hiding (style)
 
 import           Lucid
-
-sampleWorks :: [Work]
-sampleWorks =
-  [ Work
-    "20190515-yudachi"
-    0x5c530d6e
-    Picture
-    [ (Japanese, WorkMeta "お祈り夕立" "艦隊これくしょん")
-    , (English, WorkMeta "Yudachi praying" "Kantai Collection")
-    ]
-  , Work
-    "20190406-lily"
-    0x5c530d6e
-    Picture
-    [ (Japanese, WorkMeta "百合の魔術師" "")
-    , (English, WorkMeta "The witch of lily" "")
-    ]
-  ]
 
 encodeWorksSummary :: [Work] -> Language -> LBS.ByteString
 encodeWorksSummary works lang =
@@ -140,6 +122,7 @@ data ContentType
   | JavaScript
   | Css
   | Svg
+  | Jpeg
   deriving (Show, Eq)
 
 typeToHeader :: ContentType -> Header
@@ -152,6 +135,7 @@ typeToHeader =
       JavaScript -> h "text/javascript"
       Css -> h "text/css"
       Svg -> h "image/svg+xml"
+      Jpeg -> h "image/jpeg"
 
 data ContentData
   = File FilePath
@@ -166,13 +150,13 @@ data Asset = Asset
 makeLensesWith classyRules_ ''Asset
 
 data AssetsEnv = AssetsEnv
-  { files      :: HM.HashMap ST.Text Asset
-  , images       :: HM.HashMap String LBS.ByteString
+  { files  :: HM.HashMap ST.Text Asset
+  , images :: HM.HashMap ST.Text Asset
   } deriving(Show)
 
 makeClassy_ ''AssetsEnv
 
-data Env = Env
+newtype Env = Env
   { assets :: AssetsEnv
   } deriving(Show)
 
@@ -181,10 +165,13 @@ makeLensesWith classyRules_ ''Env
 instance HasAssetsEnv Env where
   assetsEnv = _assets
 
+type KlaraWorks env = ReaderT env IO Application
 
 server :: (HasAssetsEnv env) => KlaraWorks env
 server = do
-  fs <- view (assetsEnv . _files)
+  fs' <- view (assetsEnv . _files)
+  imgs <- view (assetsEnv . _images)
+  let fs = HM.union fs' imgs
   pure $
     \req res ->
       let
@@ -247,15 +234,32 @@ boot = do
        , ("MPLUS1p.css", Asset (File "./assets/M+PLUS+1p.css") Css)
        ]
       )
-      HM.empty
+      (HM.fromList
+       [ ("20190515-yudachi-0.jpg", Asset (File "./img/20190515-yudachi-0.jpg") Jpeg)
+       , ("20190406-lily-0.jpg", Asset (File "./img/20190406-lily-0.jpg") Jpeg)
+      ]
+      )
      )
     )
 
-type ApplicationM m = Request -> (Response -> m ResponseReceived) -> m ResponseReceived
-newtype KlaraT env m a = KlaraT { runK :: ReaderT env m a }
-  deriving (Functor, Applicative, Monad, MonadIO, MonadThrow, MonadCatch, MonadMask)
+sampleWorks :: [Work]
+sampleWorks =
+  [ Work
+    "20190515-yudachi"
+    0x5c530d6e
+    Picture
+    [ (Japanese, WorkMeta "お祈り夕立" "艦隊これくしょん")
+    , (English, WorkMeta "Yudachi praying" "Kantai Collection")
+    ]
+  , Work
+    "20190406-lily"
+    0x5c530d6e
+    Picture
+    [ (Japanese, WorkMeta "百合の魔術師" "")
+    , (English, WorkMeta "The witch of lily" "")
+    ]
+  ]
 
-type KlaraWorks env = ReaderT env IO Application
 
 
 
