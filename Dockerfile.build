@@ -1,0 +1,15 @@
+FROM haskell:8.6.3
+
+RUN echo >> ~/.stack/configure.yaml && echo 'system-ghc: true' >> ~/.stack/configure.yaml
+
+RUN stack setup --resolver lts-13.8
+
+RUN curl -sL https://deb.nodesource.com/setup_11.x | bash -  && apt-get install -y nodejs
+
+RUN npm i -g npm
+
+RUN apt install -y apt-transport-https ca-certificates curl software-properties-common gnupg2 \
+  && curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add - \
+  && add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/debian $(lsb_release -cs) stable" \
+  && apt update \
+  && apt install -y docker-ce docker-ce-cli containerd.io

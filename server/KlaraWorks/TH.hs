@@ -33,7 +33,8 @@ build = do
   mapM_ addDependentFile deps
   runIO $ do
     createDirectoryIfMissing True "./__temp"
-    callCommand "npx elm make client/Main.elm --optimize --output=./__temp/main.js"
+    createDirectoryIfMissing True "./dist"
+    callCommand "npx elm make client/Main.elm --output=./__temp/main.js"
     callCommand "npx uglifyjs --compress 'pure_funcs=\"F2,F3,F4,F5,F6,F7,F8,F9,A2,A3,A4,A5,A6,A7,A8,A9\",pure_getters,keep_fargs=false,unsafe_comps,unsafe'  ./__temp/main.js | npx uglifyjs  --mangle -- > ./dist/main.js"
     removeDirectoryRecursive "./__temp"
   [| return () |]

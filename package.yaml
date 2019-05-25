@@ -10,6 +10,10 @@ extra-source-files:
 - README.md
 - ChangeLog.md
 - client/Main.elm
+- client/View.elm
+- client/Types.elm
+- client/Codec.elm
+- client/Fetch.elm
 
 synopsis:            My website server
 category:            Web
@@ -20,19 +24,48 @@ dependencies:
 - base >= 4.7 && < 5
 - aeson
 - bytestring
+- binary
 - clay
 - directory
+- file-embed
 - http-types
 - lens
 - lens-aeson
 - lucid
+- mtl
 - process
+- safe-exceptions
 - template-haskell
 - text
+- unordered-containers
 - vector
 - wai
 - warp
+- warp-tls
 - yaml
+
+# develop
+- foreign-store
+
+default-extensions:
+- DataKinds
+- ConstraintKinds
+- ExistentialQuantification
+- FlexibleContexts
+- FlexibleInstances
+- KindSignatures
+- LambdaCase
+- MultiParamTypeClasses
+- OverloadedLabels
+- OverloadedStrings
+- RankNTypes
+- RecordWildCards
+- PolyKinds
+- ScopedTypeVariables
+- TypeApplications
+- TypeFamilies
+- TypeOperators
+- TypeSynonymInstances
 
 executables:
   klaraworks:
@@ -46,7 +79,7 @@ executables:
 tests:
   klaraworks-test:
     main:                Spec.hs
-    source-dirs:         test
+    source-dirs:         server-test
     ghc-options:
     - -threaded
     - -rtsopts

@@ -2,25 +2,58 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/node:10.14.2
+      - image: kirisaki/klaraworks-build:0.4
     steps:
       - checkout
       - setup_remote_docker
+
+      # node.js
       - restore_cache:
-          name: Restore Yarn Package Cache
+          name: Restore node_modules cache
           keys:
-            - yarn-packages-{{ checksum "yarn.lock" }}
+            - node_modules-{{ checksum "package.json" }}
       - run:
-          name: Install Dependencies
-          command: yarn install --frozen-lockfile
+          name: Install node packages
+          command: npm i
       - save_cache:
-          name: Save Yarn Package Cache
-          key: yarn-packages-{{ checksum "yarn.lock" }}
+          name: Save .stack
+          key: node_modules-{{ checksum "package.json" }}
           paths:
-            - ~/.cache/yar
+            - ./node_modules
+
+      # elm
+      - restore_cache:
+          name: Restore .elm cache
+          keys:
+            - elm-{{ checksum "elm.json" }}
+          paths:
+            - ~/.elm
+
+      # Haskell
+      - restore_cache:
+          name: Restore .stack cache
+          keys:
+            - stack-packages-{{ checksum "package.json" }}
       - run:
-          name: Build front-end
-          command: yarn webpack
+          name: Build server
+          command: stack build
+      - save-cache:
+          name: Save .stack
+          key: stack-packages-{{ checksum "package.yaml" }}
+          paths:
+            - ~/.stack
+      - save_cache:
+          name: Save .elm
+          key: elm-{{ checksum "elm.json" }}
+          paths:
+            - ./node_modules
+
+      # tests
+      - run:
+          name: Haskell test
+          command: stack test
+
+      # Build docker image
       - run:
           name: Setup common environment variables
           command: |
@@ -38,6 +71,7 @@ jobs:
           root: .
           paths:
             - docker-image
+  
   deploy:  
     docker:
       - image: circleci/python:3.6.1
