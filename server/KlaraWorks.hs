@@ -51,7 +51,7 @@ encodeWorksSummary works lang =
                       lenId <> (fromByteString . STE.encodeUtf8) (workId w) <>
                       putInt32be (workTimestamp w) <>
                       lenTitle <> (fromByteString . STE.encodeUtf8) (workMetaTitle m)
-             ) works
+             ) (L.sort works)
   in
     case catMaybes summaries of
       [] -> "\x44"
@@ -102,14 +102,17 @@ workTypeToCode = \case
 data WorkMeta = WorkMeta
   { workMetaTitle  :: ST.Text
   , workMetaOrigin :: ST.Text
-  }
+  } deriving (Eq)
 
 data Work = Work
   { workId        :: ST.Text
   , workTimestamp :: Int32
   , workType      :: WorkType
   , workMeta      :: [(Language, WorkMeta)]
-  }
+  } deriving (Eq)
+
+instance Ord Work where
+  x <= y = workTimestamp x <= workTimestamp y
 
 length8 :: ST.Text -> Word8
 length8 = fromIntegral . SBS.length . STE.encodeUtf8
@@ -246,7 +249,7 @@ sampleWorks :: [Work]
 sampleWorks =
   [ Work
     "20190515-yudachi"
-    0x5c530d6e
+    0x5c530dff
     Picture
     [ (Japanese, WorkMeta "お祈り夕立" "艦隊これくしょん")
     , (English, WorkMeta "Yudachi praying" "Kantai Collection")
